@@ -28,6 +28,7 @@ model: sonnet
 3. `reports/{RUN-ID}/` 폴더 존재 확인 (없으면 생성)
 4. `reports/{RUN-ID}/progress.jsonl` 존재 확인 (없으면 빈 파일 생성)
 5. `reports/{RUN-ID}/screenshots/` 폴더 존재 확인 (없으면 생성)
+6. **뷰포트 리사이즈**: `browser_resize({ width: 1440, height: 1440 })` 를 첫 페이지 로드 직후 1회 호출. 이후 모든 스크린샷은 이 큰 뷰포트로 캡처되어 본문·사이드패널이 한 화면에 잡힌다.
 
 ---
 
@@ -53,6 +54,11 @@ model: sonnet
 핵심 단계마다 `reports/{RUN-ID}/screenshots/` 에 PNG 저장.
 **파일명 규칙**: `{scenario-slug}-{tc-id}-{step}-{설명}.png`
 예: `signup-tc04-01-resend-click.png`
+
+**캡처 범위 규칙**:
+- **기본은 전체 뷰포트** — `browser_take_screenshot` 호출 시 `element` / `ref` 파라미터를 **주지 않는다**. 그래야 본문 + 사이드패널 + 상단 메뉴가 한 장에 잡혀 증거로서 의미가 있다.
+- AI 응답 토큰 수, 작은 다이얼로그처럼 **의도적으로 일부만 크롭**해야 검증이 더 명확한 경우에만 `element` 로 스코프. 이 경우 파일명에 `-zoom` 같은 suffix 로 표시 (예: `01-docx-tc01-03-ai-panel-zoom.png`).
+- 페이지 전체(스크롤 영역 포함)가 필요하면 `fullPage: true` 사용. iframe 안의 canvas(OnlyOffice 본문) 는 fullPage 가 잡지 못하므로 본문 검증용으로는 큰 뷰포트 + 일반 스크린샷이 더 적합.
 
 ### 5) **즉시 기록 — `progress.jsonl` 에 1줄 append**
 
@@ -115,6 +121,11 @@ TC 가 끝나는 즉시 (다음 TC 로 넘어가기 전) 다음 형식의 JSON �
    - PASS → `status: "PASS"`
    - FAIL/SKIP/BLOCKED → `status: "FAIL"` (대시보드는 PASS/FAIL/— 3분기만 인식)
    - 결과 없음 → `status: "—"` (미실행)
+   - **TC별 옵션 필드 주입** (대시보드 스크린샷 모달용):
+     - `screenshots`: progress.jsonl 의 `screenshot` 배열을 `reports/` 기준 상대경로로 변환 (`screenshots/foo.png` → `{RUN-ID}/screenshots/foo.png`). 누락된 `screenshots/` prefix 는 보정.
+     - `note`: progress.jsonl 의 `note` 그대로.
+     - `run_id`: 결과를 가져온 RUN-ID.
+     - 결과 없음 TC 는 세 필드 모두 생략.
 4. **KPI 재계산** (`kpis` 객체):
    - `pass`: 전체 PASS 개수
    - `fail`: 전체 FAIL 개수
