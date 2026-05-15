@@ -178,4 +178,4 @@
 
 | 일시 | 환경 | 결과 | RUN-ID | 비고 |
 |---|---|---|---|---|
-| - | - | - | - | - |
+| 2026-05-15 17:03 | dev | ❌ 1/10 (BLOCKED 2) | RUN-20260515-1703-dev | TC-01 표가 도형 묶음, TC-03/05/07/08/09 patch_native_slide elements 미렌더링 버그 (invalid_rect), TC-06 범위 축소, TC-02/04 selection 자동화 불가, TC-10 거절 PASS |

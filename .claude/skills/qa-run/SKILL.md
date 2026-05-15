@@ -165,6 +165,51 @@ TC 가 끝나는 즉시 (다음 TC 로 넘어가기 전) 다음 형식의 JSON �
 
 ---
 
+## AI 시나리오 전용 규칙 (DOCX / PPT / Excel)
+
+`scenarios/01-AI-DOCX-편집.md`, `02-AI-PPT-편집.md`, `03-AI-Excel-편집.md` 류 AI 시나리오에는 다음 두 규칙이 **추가로** 적용된다.
+
+### 1) 진입 경로 — "미리보기 (MCP ver)" 플라스크 아이콘만 사용
+
+드라이브 파일 행에 호버하면 액션 아이콘이 5개 표시된다.
+
+- **첫 번째 "미리보기"** (`title="미리보기"`, `gi gi-new-window` 아이콘) → AI 채팅이 **없는** 기존 편집기. **사용 금지.**
+- **두 번째 "미리보기 (MCP ver)"** (`title="미리보기 (MCP ver)"`, `fal fa-flask` 플라스크 아이콘) → AI 사이드패널이 붙은 신규 편집기 (`feature-connector-develop-document.devoffice.hiworks.com` 호스트). **이걸 클릭한다.**
+
+호버 상태가 잘 안 잡히거나 ref 가 사라지면 `browser_evaluate` 로 우회:
+
+```js
+const target = Array.from(document.querySelectorAll('*'))
+  .find(el => el.textContent === '<파일명>.docx' && el.children.length === 0);
+let row = target;
+for (let i = 0; i < 8; i++) {
+  row = row.parentElement;
+  const buttons = row.querySelectorAll('button, [role="button"]');
+  if (buttons.length >= 3) { buttons[1].click(); break; }  // index 1 = 플라스크
+}
+```
+
+이후 흐름: 새 탭 select → 상단 **문서편집** 클릭 → **Hiworks AI** 탭 → **AI 채팅** 버튼 → 우측 사이드패널 활성화. "AI채팅 Pro로 업그레이드 되었습니다" 안내 다이얼로그가 뜨면 닫기.
+
+### 2) 본문 직접 편집 금지 — AI 가 편집하는지를 검증한다
+
+이 시나리오들의 검증 대상은 **AI 사이드패널 자체**다. Skill 이 본문을 직접 수정해버리면 검증이 무의미해진다.
+
+- **허용 (사용자 사전 준비)**: 커서 위치 클릭, 텍스트 선택(드래그), 표·문단 클릭 등 시나리오의 "조작 순서" 가 명시한 위치/선택 동작.
+- **금지 (AI 가 해야 할 작업)**: 본문에 직접 타이핑, Enter 로 빈 줄 만들기, 표 삽입, 서식·정렬·글자 크기 변경, 글머리 기호 적용 등.
+
+진행 패턴:
+
+1. (필요 시) 시나리오가 요구하는 커서 위치 / 텍스트 선택만 본문에서 수행
+2. 시나리오의 프롬프트를 AI 사이드패널 채팅창에 **그대로** 입력 → 전송
+3. AI 응답 대기, "본문에 삽입" 같은 액션이 있으면 그것만 클릭
+4. 본문 결과를 스냅샷·스크린샷으로 캡처해 "기대 결과"·"검증 포인트" 와 비교
+5. PASS / FAIL 판정
+
+사전조건 미달(예: 빈 단락이 없어서 커서 위치 잡을 곳이 없음)이면 그 자체로 시나리오 진행 불가다. 다른 파일을 고르거나 시나리오 갱신을 권고할 것 — **빈 줄을 직접 만들어 검증을 위조하지 말 것.**
+
+---
+
 ## 중요 규칙
 
 - **민감 정보 보호**: `environments/*.md` 의 비밀번호·토큰 등은 `progress.jsonl`, `result.md`, 메인 반환 요약 어디에도 절대 포함 X
