@@ -1,0 +1,32 @@
+# Claude Code 로컬 설정 (사용자별)
+.claude/settings.local.json
+
+# 환경별 민감정보 (URL·계정·비밀번호·테스트카드 포함)
+# 신규 환경 추가 시 environments/_template.md 를 복사해 사용
+environments/dev.md
+environments/stage.md
+environments/prd.md
+
+# 실행 리포트 — 모든 휘발성 산출물 ignore
+# 추적 O: templates/* (빈 양식 source of truth)
+# 추적 X: reports/ 의 모든 라이브 파일 (첫 실행 시 templates/ 에서 복사)
+reports/dashboard.html
+reports/data.js
+reports/STATUS.md
+reports/HISTORY.md
+reports/RUN-*/
+
+# OS / 에디터
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Playwright MCP 작업 폴더 / 검증용 스크린샷
+.playwright-mcp/
+dashboard-*.png
+
+# Node (혹시 추후 도구 추가 시)
+node_modules/
+npm-debug.log*
