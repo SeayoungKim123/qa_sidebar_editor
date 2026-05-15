@@ -4,8 +4,9 @@
 
 | RUN ID | 일시 | 환경 | 대상 | Pass | Fail | Skip | 소요시간 | 비고 |
 |---|---|---|---|---|---|---|---|---|
-| (실행 없음) | | | | | | | | |
+| RUN-20260515-1543-dev | 2026-05-15 15:43 | dev | 01-AI-DOCX-편집 | 6 | 3 | 1 (BLOCKED) | ~50m | TC-02/05/09 FAIL, TC-08 BLOCKED |
+| RUN-20260515-1703-dev | 2026-05-15 17:03 | dev | 02-AI-PPT-편집 | 1 | 7 | 2 (BLOCKED) | ~37m | TC-10만 PASS, TC-02/04 BLOCKED |
+| RUN-20260515-1758-dev | 2026-05-15 17:58 | dev | 03-AI-Excel-편집 | 9 | 4 | 0 | ~30m | TC-06/07/11/12 FAIL (AI 도구 한계) |
 
 ---
 > 이 파일은 매 실행 후 Claude가 한 줄씩 추가합니다. 과거 행은 보존합니다.
-> 이 파일은 `templates/HISTORY.md` 의 빈 양식입니다. 첫 실행 시 `reports/HISTORY.md` 로 복사됩니다.
