@@ -47,7 +47,7 @@ PM(대표님)이 자연어 시나리오만 작성하고, Claude 가 Playwright M
 | `environments/_template.md` | O | 환경 양식만 추적 |
 | `environments/{dev,stage,prd}.md` | **X (gitignored)** | 민감정보 (URL·계정·테스트카드). 절대 커밋·요약·로그에 노출 금지. |
 | `templates/` | O | **빈 양식 source of truth.** `dashboard.html` · `data.js` · `STATUS.md` · `HISTORY.md`. |
-| `reports/` | **X (전체 ignore)** | 휘발성 산출물. 첫 실행 시 메인 Claude 가 `templates/` → `reports/` 로 복사. |
+| `reports/` | O | 실행 산출물 (RUN 폴더·스크린샷·대시보드·STATUS/HISTORY). 추적해 이력 보존. 첫 실행 시 메인 Claude 가 `templates/` → `reports/` 로 복사. |
 | `_sample/` | O | 시나리오·리포트 예시 (가상 데이터). 양식 미리보기용. |
 
 ## 3계층 이력 관리 — 갱신 주체와 시점
