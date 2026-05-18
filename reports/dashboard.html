@@ -359,9 +359,24 @@
   $('tc-count').textContent = k.tc_count ?? 0;
 
   // --- Scenarios / TC ---
-  // scenarios = 전체 카탈로그. status 가 PASS/FAIL 이 아니면 (—, 미실행, null 등) 미실행으로 간주.
+  // scenarios = 전체 카탈로그. BLOCKED 는 실행된 결과로 취급하고,
+  // null/빈값/—/미실행 만 실제 미실행으로 간주.
   // tc.screenshots (string[], optional, paths relative to reports/) 있으면 행 클릭 시 모달.
   const scenarios = data.scenarios || [];
+  const aggregateCounts = scenarios.reduce((acc, s) => {
+    (s.tcs || []).forEach((tc) => {
+      const status = tc.status;
+      if (status === 'PASS') acc.pass += 1;
+      else if (status === 'FAIL') acc.fail += 1;
+      else if (status === 'BLOCKED') acc.blocked += 1;
+      else acc.unrun += 1;
+      acc.total += 1;
+    });
+    return acc;
+  }, { pass: 0, fail: 0, blocked: 0, unrun: 0, total: 0 });
+  const computedPassRate = (aggregateCounts.pass + aggregateCounts.fail) > 0
+    ? Math.round((aggregateCounts.pass / (aggregateCounts.pass + aggregateCounts.fail)) * 100)
+    : null;
   // (scenarioIdx, tcIdx) → tc 로 빠르게 찾기 위한 lookup
   const tcLookup = {};
   scenarios.forEach((s, sIdx) => {
@@ -370,18 +385,38 @@
     });
   });
 
+  const passRateEl = $('pass-rate');
+  if (typeof computedPassRate === 'number') {
+    passRateEl.textContent = computedPassRate + '%';
+    passRateEl.classList.remove('muted');
+    passRateEl.style.color = computedPassRate >= 90 ? '#10b981'
+                         : computedPassRate >= 70 ? '#f59e0b'
+                         : '#ef4444';
+  }
+  $('pass-fail').textContent = `${aggregateCounts.pass} PASS, ${aggregateCounts.fail} FAIL`;
+  $('scenario-count').textContent = scenarios.length;
+  $('tc-count').textContent = aggregateCounts.total;
+
   if (scenarios.length > 0) {
     $('scenario-list').innerHTML = scenarios.map((s, sIdx) => {
       const tcs = s.tcs || [];
-      const skipCount = tcs.filter((tc) => tc.status !== 'PASS' && tc.status !== 'FAIL').length;
-      const statText = skipCount > 0
-        ? `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass · ${skipCount} 미실행`
-        : `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass`;
+      const blockedCount = tcs.filter((tc) => tc.status === 'BLOCKED').length;
+      const unrunCount = tcs.filter((tc) => {
+        const status = tc.status;
+        return status == null || status === '' || status === '—' || status === '미실행';
+      }).length;
+      const statText = unrunCount > 0
+        ? `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass · ${unrunCount} 미실행`
+        : blockedCount > 0
+          ? `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass · ${blockedCount} BLOCKED`
+          : `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass`;
       const rows = tcs.map((tc, tIdx) => {
         const isPass = tc.status === 'PASS';
         const isFail = tc.status === 'FAIL';
-        const statusClass = isPass ? 'badge-pass' : isFail ? 'badge-fail' : 'badge-skip';
-        const statusText = (isPass || isFail) ? tc.status : '—';
+        const isBlocked = tc.status === 'BLOCKED';
+        const isUnrun = tc.status == null || tc.status === '' || tc.status === '—' || tc.status === '미실행';
+        const statusClass = isPass ? 'badge-pass' : isFail ? 'badge-fail' : isBlocked ? 'badge-warn' : 'badge-skip';
+        const statusText = (isPass || isFail || isBlocked) ? tc.status : '—';
         const hasShots = Array.isArray(tc.screenshots) && tc.screenshots.length > 0;
         const rowAttrs = hasShots
           ? ` class="has-shots" data-sidx="${sIdx}" data-tidx="${tIdx}" title="스크린샷 ${tc.screenshots.length}장 보기"`
@@ -421,6 +456,20 @@
           </table>
         </div>`;
     }).join('');
+    Array.from(document.querySelectorAll('.tc-block')).forEach((block, sIdx) => {
+      const tcs = scenarios[sIdx]?.tcs || [];
+      const pass = tcs.filter((tc) => tc.status === 'PASS').length;
+      const fail = tcs.filter((tc) => tc.status === 'FAIL').length;
+      const blocked = tcs.filter((tc) => tc.status === 'BLOCKED').length;
+      const unrun = tcs.filter((tc) => tc.status !== 'PASS' && tc.status !== 'FAIL' && tc.status !== 'BLOCKED').length;
+      const statEl = block.querySelector('.tc-block-stat');
+      if (!statEl) return;
+      statEl.textContent = unrun > 0
+        ? `${pass}/${tcs.length} PASS, ${unrun} UNRUN`
+        : blocked > 0
+          ? `${pass}/${tcs.length} PASS, ${blocked} BLOCKED`
+          : `${pass}/${tcs.length} PASS, ${fail} FAIL`;
+    });
   }
 
   // --- Issues ---
@@ -501,7 +550,7 @@
     activeIdx = 0;
     activeTc = tc;
     activeScenario = scenario;
-    const statusBadge = tc.status === 'PASS' ? '✅' : tc.status === 'FAIL' ? '❌' : '·';
+    const statusBadge = tc.status === 'PASS' ? '✅' : tc.status === 'FAIL' ? '❌' : tc.status === 'BLOCKED' ? '⚠️' : '·';
     modalTitle.innerHTML = `<span class="mono">${escapeHtml(tc.id)}</span>${statusBadge} ${escapeHtml(scenario.id)} — ${escapeHtml(tc.name)}`;
     const runId = tc.run_id || '';
     modalMeta.textContent = runId ? `RUN ${runId}` : 'RUN —';
