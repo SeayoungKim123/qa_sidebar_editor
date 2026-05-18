@@ -43,13 +43,26 @@
   .tc-block-title { font-size: 14px; font-weight: 600; color: #0f172a; }
   .tc-block-stat { font-size: 12px; color: #64748b; font-variant-numeric: tabular-nums; }
   .tc-list { width: 100%; border-collapse: collapse; }
+  .tc-list thead th {
+    text-align: left; padding: 8px 0; border-bottom: 1px solid #e2e8f0;
+    font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
+  }
   .tc-list td { padding: 8px 0; border-bottom: 1px solid #f8fafc; font-size: 13px; vertical-align: middle; }
   .tc-list tr:last-child td { border-bottom: none; }
-  .tc-list tr.has-shots { cursor: pointer; }
-  .tc-list tr.has-shots:hover { background: #f8fafc; }
   .tc-id { font-family: "SF Mono", Consolas, "Cascadia Code", monospace; font-size: 12px; color: #475569; width: 70px; }
-  .tc-name { color: #0f172a; }
+  .tc-name {
+    width: 180px; color: #0f172a; padding-right: 28px;
+    white-space: normal; word-break: keep-all; line-height: 1.45;
+  }
+  .tc-prompt-col {
+    width: 48%;
+    color: #475569; font-size: 12px; line-height: 1.5;
+    white-space: normal; word-break: normal; overflow-wrap: anywhere;
+    padding-right: 12px; padding-left: 24px;
+  }
   .tc-shots { width: 56px; text-align: center; color: #94a3b8; font-size: 12px; white-space: nowrap; }
+  .tc-shots.is-clickable { cursor: pointer; }
+  .tc-shots.is-clickable:hover { background: #f8fafc; }
   .tc-shots-icon { display: inline-block; white-space: nowrap; }
   .tc-status { width: 80px; text-align: right; }
   .tc-tag { width: 90px; text-align: right; font-size: 11px; color: #94a3b8; }
@@ -264,6 +277,42 @@
   const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
     { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]
   ));
+  const tcPromptMap = {
+    'RUN-20260515-1543-dev:TC-01': '여기에 3행 4열 표 만들어줘. 헤더는 이름/부서/직급/입사일',
+    'RUN-20260515-1543-dev:TC-02': '선택한 단락 글자 크기를 16pt로 키워줘',
+    'RUN-20260515-1543-dev:TC-03': '가비아라는 IT 회사 소개를 3문단으로 작성해줘. 사업분야, 강점, 비전 순서로',
+    'RUN-20260515-1543-dev:TC-04': '이 줄을 굵게 하고 가운데 정렬해줘',
+    'RUN-20260515-1543-dev:TC-05': '방금 추가한 가비아 소개 3문단을 글머리 기호 목록으로 만들어줘',
+    'RUN-20260515-1543-dev:TC-06': '부서별 인원 표 2행 3열 만들고, 첫 행은 굵게 + 배경색 회색으로 해줘',
+    'RUN-20260515-1543-dev:TC-07': "문서 표지를 만들어줘. 제목 '2026 사업계획서', 부제 '가비아 AI팀', 가운데 정렬, 제목 36pt 굵게 파랑(#1E66F5), 부제 18pt 회색, 표지와 본문 사이 페이지 나누기",
+    'RUN-20260515-1543-dev:TC-08': "본문에 있는 'II. 2025년 상반기 실적 검토' 아래의 표를 디자인해줘...",
+    'RUN-20260515-1543-dev:TC-09': "문서의 모든 섹션 제목(I. xxx, II. xxx ...)을 '제목 2' 스타일로 통일하고, 색은 짙은 남색, 위쪽에 12pt 여백 추가해줘",
+    'RUN-20260515-1543-dev:TC-10': '이 문서를 PDF로 바꿔서 이메일로 보내줘',
+    'RUN-20260515-1703-dev:TC-01': '분기별 매출표(1Q~4Q, 매출액) 슬라이드 1장 추가해줘',
+    'RUN-20260515-1703-dev:TC-02': '1번 슬라이드의 제목 글자 크기를 36pt로 키우고 굵게 해줘',
+    'RUN-20260515-1703-dev:TC-03': '가비아 IT 회사 소개 슬라이드 3장 만들어줘. 1)표지 2)사업분야 3)비전. 각 슬라이드 본문은 글머리 기호 3개',
+    'RUN-20260515-1703-dev:TC-04': '2번 슬라이드 본문을 가운데 정렬하고 글자 색을 파랑(#1E66F5)으로 바꿔줘',
+    'RUN-20260515-1703-dev:TC-05': "7번 슬라이드 본문에 'AI 편집', '협업', '클라우드' 3개 항목을 글머리 기호로 추가해줘",
+    'RUN-20260515-1703-dev:TC-06': "모든 슬라이드 제목을 'Pretendard' 폰트, 32pt, 굵게로 통일해줘",
+    'RUN-20260515-1703-dev:TC-07': '전체 슬라이드 디자인 테마를 모던 비즈니스 스타일로 바꿔줘. 메인 색상은 짙은 남색(#0F2A5F), 강조색은 주황(#FF8A3D), 배경은 흰색, 제목은 굵은 산세리프',
+    'RUN-20260515-1703-dev:TC-08': "1번 표지 슬라이드를 디자인해줘. 제목 'AI 문서 편집 데모', 부제 '가비아 AI팀 2026', 배경은 짙은 남색 그라데이션, 제목은 흰색 굵게 48pt, 좌측 하단에 작은 강조 도형 추가",
+    'RUN-20260515-1703-dev:TC-09': "3번 슬라이드 우측 상단에 'NEW' 라벨이 들어간 빨간색 둥근 사각형 강조 도형을 추가해줘",
+    'RUN-20260515-1703-dev:TC-10': '이 슬라이드를 영상으로 변환해줘',
+    'RUN-20260515-1758-dev:TC-01': '시트1 A1부터 C5까지 가계부 표 만들어줘. 헤더는 날짜/항목/금액, 예시 데이터 4행 채워줘',
+    'RUN-20260515-1758-dev:TC-02': '선택한 헤더 행(시트1 A1:C1)을 굵게 + 글자 크기 14pt + 배경색 연회색(#E5E5E5)으로 해줘',
+    'RUN-20260515-1758-dev:TC-03': '시트2 B1부터 아래로 1월부터 12월까지 입력해줘',
+    'RUN-20260515-1758-dev:TC-04': '시트2 C2:C10에 임의 숫자 데이터 9행 채우고, C11 셀에 C2부터 C10까지 합계를 SUM 수식으로 넣어줘',
+    'RUN-20260515-1758-dev:TC-05': '시트2 C2:C10 선택 영역을 한국 원화(₩) 통화 형식으로 바꿔줘',
+    'RUN-20260515-1758-dev:TC-06': '시트1 A1:C5 선택 영역을 가운데 정렬하고, 모든 셀에 얇은 검은색 테두리 적용해줘',
+    'RUN-20260515-1758-dev:TC-07': '시트3 A1:C6에 3명의 1~5월 매출 표 만들고, B7~C7에 각 컬럼 합계 SUM 수식 넣고, 헤더 굵게 처리해줘',
+    'RUN-20260515-1758-dev:TC-08': "시트2의 C2:C10을 0~100 사이 점수 데이터 9개로 갱신해주고, D2:D10에 C열 점수가 60 이상이면 '합격', 미만이면 '불합격' 표시하는 IF 수식을 넣어줘",
+    'RUN-20260515-1758-dev:TC-09': '시트3 F2:G10에 사번-이름 매핑 9행 만들어줘(F열 사번 1001~1009, G열 이름). 그리고 시트3 A2에 사번 1003을 입력하고, 시트3 B2에 A2 사번에 해당하는 이름을 F:G 테이블에서 VLOOKUP으로 찾아줘.',
+    'RUN-20260515-1758-dev:TC-10': "시트4 A1:B7에 월(헤더 A1='월', B1='매출')별 매출 데이터(1월~6월, 임의 매출액)를 채우고, 이 A1:B7 데이터로 막대 차트 만들어줘. 차트 제목은 '상반기 매출', 가로축은 월, 세로축은 매출액(원)",
+    'RUN-20260515-1758-dev:TC-11': '시트4 A10:B14에 부서별 인원 데이터 채워줘(...). A10:B14 데이터로 원형 그래프(파이 차트) 만들고, 각 조각에 부서명과 백분율(%)을 데이터 레이블로 표시해줘',
+    'RUN-20260515-1758-dev:TC-12': "시트4의 '상반기 매출' 막대 차트 색상을 파랑 계열로 바꾸고, 가로축 글자 크기 12pt, 격자선 제거해줘",
+    'RUN-20260515-1758-dev:TC-13': '이 시트를 PDF로 변환해서 다운로드 받게 해줘',
+  };
+  const getTcPrompt = (tc) => tc.prompt || tcPromptMap[`${tc.run_id || ''}:${tc.id || ''}`] || '';
 
   // --- Header / meta ---
   const meta = data.meta || {};
@@ -340,11 +389,13 @@
         const shotsCell = hasShots
           ? `<span class="tc-shots-icon">📷 ${tc.screenshots.length}</span>`
           : '';
+        const prompt = getTcPrompt(tc);
         return `
-          <tr${rowAttrs}>
+          <tr>
             <td class="tc-id">${escapeHtml(tc.id)}</td>
             <td class="tc-name">${escapeHtml(tc.name)}</td>
-            <td class="tc-shots">${shotsCell}</td>
+            <td class="tc-prompt-col">${escapeHtml(prompt)}</td>
+            <td class="tc-shots${hasShots ? ' is-clickable' : ''}"${hasShots ? ` data-sidx="${sIdx}" data-tidx="${tIdx}" title="?ㅽ겕由곗꺑 ${tc.screenshots.length}??蹂닿린"` : ''}>${shotsCell}</td>
             <td class="tc-tag">${tagHtml}</td>
             <td class="tc-status"><span class="badge ${statusClass}">${statusText}</span></td>
           </tr>`;
@@ -355,7 +406,19 @@
             <span class="tc-block-title">${escapeHtml(s.id)}</span>
             <span class="tc-block-stat">${statText}</span>
           </div>
-          <table class="tc-list">${rows}</table>
+          <table class="tc-list">
+            <thead>
+              <tr>
+                <th class="tc-id">TC</th>
+                <th class="tc-name">이름</th>
+                <th class="tc-prompt-col">프롬프트</th>
+                <th class="tc-shots">샷</th>
+                <th class="tc-tag">태그</th>
+                <th class="tc-status">상태</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
         </div>`;
     }).join('');
   }
@@ -459,9 +522,9 @@
 
   // 이벤트 위임 — 시나리오 리스트 영역의 has-shots 행 클릭
   $('scenario-list').addEventListener('click', (e) => {
-    const tr = e.target.closest('tr.has-shots');
-    if (!tr) return;
-    openModal(Number(tr.dataset.sidx), Number(tr.dataset.tidx));
+    const shotCell = e.target.closest('td.tc-shots.is-clickable');
+    if (!shotCell) return;
+    openModal(Number(shotCell.dataset.sidx), Number(shotCell.dataset.tidx));
   });
 
   btnClose.addEventListener('click', closeModal);
