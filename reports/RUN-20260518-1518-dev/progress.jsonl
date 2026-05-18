@@ -1,0 +1,2 @@
+
+{"ts":"2026-05-18T15:18:00","run_id":"RUN-20260518-1518-dev","scenario":"02-AI-PPT-편집","tc":"TC-05","result":"PASS","duration_ms":60000,"screenshot":["RUN-20260518-1518-dev/screenshots/02-ppt-tc05-01-ai-response.png","RUN-20260518-1518-dev/screenshots/02-ppt-tc05-02-result.png","RUN-20260518-1518-dev/screenshots/02-ppt-tc05-04-slide-final.png"],"note":"기존 슬라이드에 bullet 3개 삽입; HTML paste_html 방식 (응답 약 60s)"}

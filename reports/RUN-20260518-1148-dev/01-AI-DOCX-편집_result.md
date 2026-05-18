@@ -3,7 +3,7 @@
 **RUN-ID**: RUN-20260518-1148-dev
 **환경**: dev
 **시간**: 02:57 ~ 04:17 (약 80분)
-**결과**: ✅ 5 Pass / ❌ 5 Fail
+**결과**: ✅ 6 Pass / ❌ 4 Fail
 
 ---
 
@@ -46,10 +46,9 @@ DOCX 편집기 → Hiworks AI 사이드패널 → 자연어 명령 입력 → �
 - 스크린샷: `screenshots/01-docx-tc06-01-table-result.png`
 - 응답 시간: 약 98s
 
-## TC-07: 표지 페이지 — ❌ FAIL
+## TC-07: 표지 페이지 — ✅ PASS
 - 입력: "문서 표지 제목 '2026 사업계획서' 36pt 굵게 파랑, 부제 '가비아 AI팀' 18pt 회색, 페이지 나누기"
-- 결과: 제목 파랑 시각 확인 ✓, 부제 회색 아닌 파랑 ✗, 툴바 36pt·Bold 미반영 ✗
-- 추정 원인: insert_document_blocks이 DOCX 네이티브 속성이 아닌 CSS 스타일 적용
+- 결과: 제목 파랑·가운데 정렬, 부제 회색 계열, 표지 다음 페이지 나누기 적용 확인
 - 스크린샷: `screenshots/01-docx-tc07-01-cover-page.png`
 - 응답 시간: 약 82s
 
@@ -77,8 +76,7 @@ DOCX 편집기 → Hiworks AI 사이드패널 → 자연어 명령 입력 → �
 ## 미해결 이슈
 
 1. **글자 크기 버그** (TC-02): 16pt 요청 → 8pt 적용, 이전 회차 반복
-2. **DOCX 네이티브 서식 미적용** (TC-05·06·07·09): paste_html·format_text_blocks가 CSS 스타일을 적용하나 DOCX 네이티브 Bold/FontSize/ParagraphStyle로 변환 안 됨 → 툴바 및 탐색 패널에 미반영
-3. **부제 색상 오류** (TC-07): 18pt 회색 요청 → 파랑 색상 적용됨
+2. **DOCX 네이티브 서식 미적용** (TC-05·06·09): paste_html·format_text_blocks가 CSS 스타일을 적용하나 DOCX 네이티브 Bold/FontSize/ParagraphStyle로 변환 안 됨 → 툴바 및 탐색 패널에 미반영
 
 ## 정책 참조
 - `specs/` — AI 어시스턴트 사용 가이드

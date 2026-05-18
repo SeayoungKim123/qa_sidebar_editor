@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>QA 자동화 대시보드</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 32px 24px;
+    line-height: 1.5;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+  h1 { font-size: 26px; font-weight: 700; }
+  .meta { color: #64748b; font-size: 13px; margin-top: 4px; }
+  .env-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    background: #e2e8f0; color: #64748b; font-size: 12px; font-weight: 600;
+  }
+  .env-badge.active { background: #dbeafe; color: #1e40af; }
+  .updated { font-size: 12px; color: #64748b; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .card {
+    background: white; border-radius: 12px; padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    border: 1px solid #e2e8f0;
+  }
+  .kpi-label { color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .kpi-value { font-size: 32px; font-weight: 700; margin-top: 8px; line-height: 1; }
+  .kpi-value.muted { color: #cbd5e1; }
+  .kpi-sub { font-size: 12px; color: #64748b; margin-top: 6px; }
+
+  .section-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: #0f172a; }
+
+  /* Scenario / TC list */
+  .tc-block + .tc-block { margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
+  .tc-block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .tc-block-title { font-size: 14px; font-weight: 600; color: #0f172a; }
+  .tc-block-stat { font-size: 12px; color: #64748b; font-variant-numeric: tabular-nums; }
+  .tc-list { width: 100%; border-collapse: collapse; }
+  .tc-list thead th {
+    text-align: left; padding: 8px 0; border-bottom: 1px solid #e2e8f0;
+    font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
+  }
+  .tc-list thead th.tc-duration { text-align: right; }
+  .tc-list thead th.tc-shots { text-align: center; }
+  .tc-list thead th.tc-status { text-align: right; }
+  .tc-list td { padding: 8px 0; border-bottom: 1px solid #f8fafc; font-size: 13px; vertical-align: middle; }
+  .tc-list tr:last-child td { border-bottom: none; }
+  .tc-id { font-family: "SF Mono", Consolas, "Cascadia Code", monospace; font-size: 12px; color: #475569; width: 70px; }
+  .tc-name {
+    width: 180px; color: #0f172a; padding-right: 28px;
+    white-space: normal; word-break: keep-all; line-height: 1.45;
+  }
+  .tc-prompt-col {
+    width: 48%;
+    color: #475569; font-size: 12px; line-height: 1.5;
+    white-space: normal; word-break: normal; overflow-wrap: anywhere;
+    padding-right: 12px; padding-left: 24px;
+  }
+  .tc-shots { width: 56px; text-align: center; color: #94a3b8; font-size: 12px; white-space: nowrap; }
+  .tc-shots.is-clickable { cursor: pointer; }
+  .tc-shots.is-clickable:hover { background: #f8fafc; }
+  .tc-shots-icon { display: inline-block; white-space: nowrap; }
+  .tc-status { width: 80px; text-align: right; }
+  .tc-duration { width: 56px; text-align: right; font-size: 12px; color: #94a3b8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* Table */
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl th { text-align: left; padding: 12px 16px; background: #f8fafc; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #e2e8f0; font-weight: 600; }
+  .tbl td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl-empty td { text-align: center; color: #94a3b8; padding: 32px; }
+  .mono { font-family: "SF Mono", Consolas, "Cascadia Code", monospace; font-size: 12.5px; }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge-p0 { background: #fef2f2; color: #b91c1c; }
+  .badge-p1 { background: #fffbeb; color: #b45309; }
+  .badge-pass { background: #f0fdf4; color: #15803d; }
+  .badge-warn { background: #fffbeb; color: #b45309; }
+  .badge-fail { background: #fef2f2; color: #b91c1c; }
+  .badge-skip { background: #f1f5f9; color: #94a3b8; }
+  .badge-new { background: #ede9fe; color: #6d28d9; margin-left: 4px; }
+
+  .empty-state { color: #94a3b8; font-size: 14px; padding: 40px 0; text-align: center; }
+  .empty-icon { font-size: 32px; opacity: 0.3; margin-bottom: 12px; }
+
+  .section-card { margin-bottom: 24px; }
+  footer { margin-top: 32px; text-align: center; color: #94a3b8; font-size: 12px; }
+
+  /* Screenshot modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 12px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-content {
+    background: white; border-radius: 12px; max-width: min(1400px, 100%);
+    max-height: 100%; display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    width: 100%;
+  }
+  .modal-header {
+    padding: 16px 20px; border-bottom: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .modal-title { font-size: 14px; font-weight: 600; color: #0f172a; }
+  .modal-title .mono { color: #475569; margin-right: 8px; }
+  .modal-counter { color: #94a3b8; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .modal-close {
+    background: none; border: none; font-size: 22px; line-height: 1;
+    color: #64748b; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+  }
+  .modal-close:hover { background: #f1f5f9; color: #0f172a; }
+  .modal-body {
+    flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
+    background: #0f172a; position: relative; overflow: hidden;
+  }
+  .modal-img {
+    max-width: 100%; max-height: calc(100vh - 140px);
+    object-fit: contain; display: block;
+  }
+  .modal-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.9); border: none;
+    width: 44px; height: 44px; border-radius: 50%;
+    font-size: 20px; color: #0f172a; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .modal-nav:hover { background: white; }
+  .modal-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+  .modal-nav.prev { left: 16px; }
+  .modal-nav.next { right: 16px; }
+  .modal-footer {
+    padding: 10px 20px; border-top: 1px solid #e2e8f0;
+    font-size: 12.5px; color: #475569; max-height: 18vh; overflow-y: auto;
+  }
+  .modal-footer .meta-row {
+    color: #94a3b8; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.06em; font-weight: 600; margin-bottom: 6px;
+  }
+  .modal-footer .note { line-height: 1.6; white-space: pre-wrap; }
+  .modal-footer .filename {
+    margin-top: 10px; font-family: "SF Mono", Consolas, monospace; font-size: 11px; color: #94a3b8;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>QA 자동화 대시보드<span id="title-suffix" style="font-size:13px;color:#94a3b8;font-weight:400;"></span></h1>
+      <div class="meta">
+        <span class="env-badge" id="env-badge">미실행</span>
+        &nbsp;<span id="run-id">아직 실행 이력이 없습니다</span>
+      </div>
+    </div>
+    <div class="updated">최종 업데이트: <span id="updated-at">—</span></div>
+  </header>
+
+  <!-- KPI Cards -->
+  <div class="kpis">
+    <div class="card">
+      <div class="kpi-label">전체 실행 횟수</div>
+      <div class="kpi-value" id="total-runs">0</div>
+      <div class="kpi-sub" id="runs-by-env">dev 0 · stage 0 · prd 0</div>
+    </div>
+    <div class="card">
+      <div class="kpi-label">최근 회차 통과율</div>
+      <div class="kpi-value muted" id="pass-rate">—</div>
+      <div class="kpi-sub" id="pass-fail">실행 후 표시</div>
+    </div>
+    <div class="card">
+      <div class="kpi-label">미해결 이슈</div>
+      <div class="kpi-value" id="open-issues">0</div>
+      <div class="kpi-sub" id="issues-breakdown">실행 후 표시</div>
+    </div>
+    <div class="card">
+      <div class="kpi-label">시나리오 / TC</div>
+      <div class="kpi-value"><span id="scenario-count">0</span> <span style="font-size:18px;color:#94a3b8;font-weight:500;">/ <span id="tc-count">0</span></span></div>
+      <div class="kpi-sub">시나리오 / 테스트 케이스</div>
+    </div>
+  </div>
+
+  <!-- Scenario / TC 상세 -->
+  <div class="card section-card">
+    <div class="section-title">전체 시나리오 / TC <span style="font-weight:400;color:#94a3b8;">(최근 회차 결과 오버레이 · 📷 표시 행 클릭 시 스크린샷)</span></div>
+    <div id="scenario-list">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        실행 이력이 없습니다.<br>
+        첫 실행 후 시나리오와 TC별 PASS/FAIL 결과가 여기에 표시됩니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- Issues -->
+  <div class="card section-card">
+    <div class="section-title" id="issues-title">미해결 이슈</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>우선순위</th>
+          <th>시나리오</th>
+          <th>TC</th>
+          <th>증상</th>
+          <th>최초 발견</th>
+          <th>연속 실패</th>
+        </tr>
+      </thead>
+      <tbody id="issues-body">
+        <tr class="tbl-empty"><td colspan="6">미해결 이슈가 없습니다.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- History -->
+  <div class="card">
+    <div class="section-title">최근 실행 이력</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>RUN-ID</th>
+          <th>일시</th>
+          <th>환경</th>
+          <th>대상</th>
+          <th>결과</th>
+          <th>소요</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody id="history-body">
+        <tr class="tbl-empty"><td colspan="7">실행 이력이 없습니다. 첫 실행을 시작해 보세요.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    QA 자동화 대시보드 — Generated by Claude Code · 매 실행 후 자동 갱신 (data.js)
+  </footer>
+</div>
+
+<!-- Screenshot modal -->
+<div class="modal-backdrop" id="shot-modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-content" role="document">
+    <div class="modal-header">
+      <div>
+        <span class="modal-title" id="modal-title">—</span>
+        <span class="modal-counter" id="modal-counter"></span>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="닫기">✕</button>
+    </div>
+    <div class="modal-body">
+      <button class="modal-nav prev" id="modal-prev" aria-label="이전">‹</button>
+      <img class="modal-img" id="modal-img" alt="screenshot">
+      <button class="modal-nav next" id="modal-next" aria-label="다음">›</button>
+    </div>
+    <div class="modal-footer">
+      <div class="meta-row" id="modal-meta">RUN —</div>
+      <div class="note" id="modal-note"></div>
+      <div class="filename" id="modal-filename"></div>
+    </div>
+  </div>
+</div>
+
+<script src="data-20260515.js"></script>
+<script>
+(function () {
+  const data = window.QA_DATA;
+  if (!data) return; // empty state already rendered in HTML
+
+  const $ = (id) => document.getElementById(id);
+  const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+    { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]
+  ));
+  const tcPromptMap = {
+    'RUN-20260515-1543-dev:TC-01': '여기에 3행 4열 표 만들어줘. 헤더는 이름/부서/직급/입사일',
+    'RUN-20260515-1543-dev:TC-02': '선택한 단락 글자 크기를 16pt로 키워줘',
+    'RUN-20260515-1543-dev:TC-03': '가비아라는 IT 회사 소개를 3문단으로 작성해줘. 사업분야, 강점, 비전 순서로',
+    'RUN-20260515-1543-dev:TC-04': '이 줄을 굵게 하고 가운데 정렬해줘',
+    'RUN-20260515-1543-dev:TC-05': '방금 추가한 가비아 소개 3문단을 글머리 기호 목록으로 만들어줘',
+    'RUN-20260515-1543-dev:TC-06': '부서별 인원 표 2행 3열 만들고, 첫 행은 굵게 + 배경색 회색으로 해줘',
+    'RUN-20260515-1543-dev:TC-07': "문서 표지를 만들어줘. 제목 '2026 사업계획서', 부제 '가비아 AI팀', 가운데 정렬, 제목 36pt 굵게 파랑(#1E66F5), 부제 18pt 회색, 표지와 본문 사이 페이지 나누기",
+    'RUN-20260515-1543-dev:TC-08': "본문에 있는 'II. 2025년 상반기 실적 검토' 아래의 표를 디자인해줘...",
+    'RUN-20260515-1543-dev:TC-09': "문서의 모든 섹션 제목(I. xxx, II. xxx ...)을 '제목 2' 스타일로 통일하고, 색은 짙은 남색, 위쪽에 12pt 여백 추가해줘",
+    'RUN-20260515-1543-dev:TC-10': '이 문서를 PDF로 바꿔서 이메일로 보내줘',
+    'RUN-20260515-1703-dev:TC-01': '분기별 매출표(1Q~4Q, 매출액) 슬라이드 1장 추가해줘',
+    'RUN-20260515-1703-dev:TC-02': '1번 슬라이드의 제목 글자 크기를 36pt로 키우고 굵게 해줘',
+    'RUN-20260515-1703-dev:TC-03': '가비아 IT 회사 소개 슬라이드 3장 만들어줘. 1)표지 2)사업분야 3)비전. 각 슬라이드 본문은 글머리 기호 3개',
+    'RUN-20260515-1703-dev:TC-04': '2번 슬라이드 본문을 가운데 정렬하고 글자 색을 파랑(#1E66F5)으로 바꿔줘',
+    'RUN-20260515-1703-dev:TC-05': "7번 슬라이드 본문에 'AI 편집', '협업', '클라우드' 3개 항목을 글머리 기호로 추가해줘",
+    'RUN-20260515-1703-dev:TC-06': "모든 슬라이드 제목을 'Pretendard' 폰트, 32pt, 굵게로 통일해줘",
+    'RUN-20260515-1703-dev:TC-07': '전체 슬라이드 디자인 테마를 모던 비즈니스 스타일로 바꿔줘. 메인 색상은 짙은 남색(#0F2A5F), 강조색은 주황(#FF8A3D), 배경은 흰색, 제목은 굵은 산세리프',
+    'RUN-20260515-1703-dev:TC-08': "1번 표지 슬라이드를 디자인해줘. 제목 'AI 문서 편집 데모', 부제 '가비아 AI팀 2026', 배경은 짙은 남색 그라데이션, 제목은 흰색 굵게 48pt, 좌측 하단에 작은 강조 도형 추가",
+    'RUN-20260515-1703-dev:TC-09': "3번 슬라이드 우측 상단에 'NEW' 라벨이 들어간 빨간색 둥근 사각형 강조 도형을 추가해줘",
+    'RUN-20260515-1703-dev:TC-10': '이 슬라이드를 영상으로 변환해줘',
+    'RUN-20260515-1758-dev:TC-01': '시트1 A1부터 C5까지 가계부 표 만들어줘. 헤더는 날짜/항목/금액, 예시 데이터 4행 채워줘',
+    'RUN-20260515-1758-dev:TC-02': '선택한 헤더 행(시트1 A1:C1)을 굵게 + 글자 크기 14pt + 배경색 연회색(#E5E5E5)으로 해줘',
+    'RUN-20260515-1758-dev:TC-03': '시트2 B1부터 아래로 1월부터 12월까지 입력해줘',
+    'RUN-20260515-1758-dev:TC-04': '시트2 C2:C10에 임의 숫자 데이터 9행 채우고, C11 셀에 C2부터 C10까지 합계를 SUM 수식으로 넣어줘',
+    'RUN-20260515-1758-dev:TC-05': '시트2 C2:C10 선택 영역을 한국 원화(₩) 통화 형식으로 바꿔줘',
+    'RUN-20260515-1758-dev:TC-06': '시트1 A1:C5 선택 영역을 가운데 정렬하고, 모든 셀에 얇은 검은색 테두리 적용해줘',
+    'RUN-20260515-1758-dev:TC-07': '시트3 A1:C6에 3명의 1~5월 매출 표 만들고, B7~C7에 각 컬럼 합계 SUM 수식 넣고, 헤더 굵게 처리해줘',
+    'RUN-20260515-1758-dev:TC-08': "시트2의 C2:C10을 0~100 사이 점수 데이터 9개로 갱신해주고, D2:D10에 C열 점수가 60 이상이면 '합격', 미만이면 '불합격' 표시하는 IF 수식을 넣어줘",
+    'RUN-20260515-1758-dev:TC-09': '시트3 F2:G10에 사번-이름 매핑 9행 만들어줘(F열 사번 1001~1009, G열 이름). 그리고 시트3 A2에 사번 1003을 입력하고, 시트3 B2에 A2 사번에 해당하는 이름을 F:G 테이블에서 VLOOKUP으로 찾아줘.',
+    'RUN-20260515-1758-dev:TC-10': "시트4 A1:B7에 월(헤더 A1='월', B1='매출')별 매출 데이터(1월~6월, 임의 매출액)를 채우고, 이 A1:B7 데이터로 막대 차트 만들어줘. 차트 제목은 '상반기 매출', 가로축은 월, 세로축은 매출액(원)",
+    'RUN-20260515-1758-dev:TC-11': '시트4 A10:B14에 부서별 인원 데이터 채워줘(...). A10:B14 데이터로 원형 그래프(파이 차트) 만들고, 각 조각에 부서명과 백분율(%)을 데이터 레이블로 표시해줘',
+    'RUN-20260515-1758-dev:TC-12': "시트4의 '상반기 매출' 막대 차트 색상을 파랑 계열로 바꾸고, 가로축 글자 크기 12pt, 격자선 제거해줘",
+    'RUN-20260515-1758-dev:TC-13': '이 시트를 PDF로 변환해서 다운로드 받게 해줘',
+  };
+  const getTcPrompt = (tc) => tc.prompt || tcPromptMap[`${tc.run_id || ''}:${tc.id || ''}`] || '';
+
+  // --- Header / meta ---
+  const meta = data.meta || {};
+  if (meta.title_suffix) $('title-suffix').textContent = ' ' + meta.title_suffix;
+  if (meta.env) {
+    const eb = $('env-badge');
+    eb.textContent = meta.env;
+    eb.classList.add('active');
+  }
+  if (meta.run_id) $('run-id').textContent = meta.run_id;
+  if (meta.updated_at) $('updated-at').textContent = meta.updated_at;
+  let docTitle = 'QA 자동화 대시보드';
+  if (meta.title_suffix) docTitle += ' ' + meta.title_suffix;
+  if (meta.run_id) docTitle += ' — ' + meta.run_id;
+  document.title = docTitle;
+
+  // --- KPIs ---
+  const k = data.kpis || {};
+  $('total-runs').textContent = k.total_runs ?? 0;
+  if (k.runs_by_env) $('runs-by-env').textContent = k.runs_by_env;
+
+  if (typeof k.pass_rate === 'number') {
+    const pr = $('pass-rate');
+    pr.textContent = k.pass_rate + '%';
+    pr.classList.remove('muted');
+    pr.style.color = k.pass_rate >= 90 ? '#10b981'
+                   : k.pass_rate >= 70 ? '#f59e0b'
+                   : '#ef4444';
+  }
+  if (typeof k.pass === 'number') {
+    $('pass-fail').textContent = k.pass + ' Pass · ' + (k.fail ?? 0) + ' Fail';
+  }
+
+  if (typeof k.open_issues === 'number') {
+    const oi = $('open-issues');
+    oi.textContent = k.open_issues;
+    if (k.open_issues > 0) oi.style.color = '#ef4444';
+  }
+  if (k.issues_breakdown) $('issues-breakdown').textContent = k.issues_breakdown;
+  $('scenario-count').textContent = k.scenario_count ?? 0;
+  $('tc-count').textContent = k.tc_count ?? 0;
+
+  // --- Scenarios / TC ---
+  // scenarios = 전체 카탈로그. status 가 PASS/FAIL 이 아니면 (—, 미실행, null 등) 미실행으로 간주.
+  // tc.screenshots (string[], optional, paths relative to reports/) 있으면 행 클릭 시 모달.
+  const scenarios = data.scenarios || [];
+  // (scenarioIdx, tcIdx) → tc 로 빠르게 찾기 위한 lookup
+  const tcLookup = {};
+  scenarios.forEach((s, sIdx) => {
+    (s.tcs || []).forEach((tc, tIdx) => {
+      tcLookup[`${sIdx}:${tIdx}`] = { scenario: s, tc };
+    });
+  });
+
+  if (scenarios.length > 0) {
+    $('scenario-list').innerHTML = scenarios.map((s, sIdx) => {
+      const tcs = s.tcs || [];
+      const skipCount = tcs.filter((tc) => tc.status !== 'PASS' && tc.status !== 'FAIL').length;
+      const statText = skipCount > 0
+        ? `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass · ${skipCount} 미실행`
+        : `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass`;
+      const rows = tcs.map((tc, tIdx) => {
+        const isPass = tc.status === 'PASS';
+        const isFail = tc.status === 'FAIL';
+        const statusClass = isPass ? 'badge-pass' : isFail ? 'badge-fail' : 'badge-skip';
+        const statusText = (isPass || isFail) ? tc.status : '—';
+        const hasShots = Array.isArray(tc.screenshots) && tc.screenshots.length > 0;
+        const rowAttrs = hasShots
+          ? ` class="has-shots" data-sidx="${sIdx}" data-tidx="${tIdx}" title="스크린샷 ${tc.screenshots.length}장 보기"`
+          : '';
+        const shotsCell = hasShots
+          ? `<span class="tc-shots-icon">📷 ${tc.screenshots.length}</span>`
+          : '';
+        const prompt = getTcPrompt(tc);
+        return `
+          <tr>
+            <td class="tc-id">${escapeHtml(tc.id)}</td>
+            <td class="tc-name">${escapeHtml(tc.name)}</td>
+            <td class="tc-prompt-col">${escapeHtml(prompt)}</td>
+            <td class="tc-duration">${escapeHtml(tc.duration || '—')}</td>
+            <td class="tc-shots${hasShots ? ' is-clickable' : ''}"${hasShots ? ` data-sidx="${sIdx}" data-tidx="${tIdx}" title="스크린샷 ${tc.screenshots.length}장 보기"` : ''}>${shotsCell}</td>
+            <td class="tc-status"><span class="badge ${statusClass}">${statusText}</span></td>
+          </tr>`;
+      }).join('');
+      return `
+        <div class="tc-block">
+          <div class="tc-block-header">
+            <span class="tc-block-title">${escapeHtml(s.id)}</span>
+            <span class="tc-block-stat">${statText}</span>
+          </div>
+          <table class="tc-list">
+            <thead>
+              <tr>
+                <th class="tc-id">TC</th>
+                <th class="tc-name">이름</th>
+                <th class="tc-prompt-col">프롬프트</th>
+                <th class="tc-duration">소요</th>
+                <th class="tc-shots">샷</th>
+                <th class="tc-status">상태</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }).join('');
+  }
+
+  // --- Issues ---
+  const issues = data.issues || [];
+  $('issues-title').textContent = '미해결 이슈' + (issues.length > 0 ? ` (${issues.length}건)` : '');
+  if (issues.length > 0) {
+    $('issues-body').innerHTML = issues.map((i) => {
+      const pCls = i.priority === 'P0' ? 'badge-p0' : 'badge-p1';
+      const newBadge = i.new ? '<span class="badge badge-new">신규</span>' : '';
+      const consecutiveNum = parseInt(i.consecutive, 10) || 0;
+      const consecutiveHtml = consecutiveNum >= 3
+        ? `<strong style="color:#b91c1c;">${escapeHtml(i.consecutive)}</strong>`
+        : escapeHtml(i.consecutive || '');
+      return `
+        <tr>
+          <td><span class="badge ${pCls}">${escapeHtml(i.priority)}</span></td>
+          <td>${escapeHtml(i.scenario)}</td>
+          <td class="mono">${escapeHtml(i.tc)}</td>
+          <td>${escapeHtml(i.symptom)}${newBadge}</td>
+          <td class="mono">${escapeHtml(i.first_seen || '')}</td>
+          <td>${consecutiveHtml}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  // --- History ---
+  const history = data.history || [];
+  if (history.length > 0) {
+    $('history-body').innerHTML = history.map((h) => {
+      const cls = 'badge-' + (h.status_class || 'warn');
+      return `
+        <tr>
+          <td class="mono">${escapeHtml(h.run_id)}</td>
+          <td>${escapeHtml(h.date)}</td>
+          <td>${escapeHtml(h.env)}</td>
+          <td>${escapeHtml(h.target)}</td>
+          <td><span class="badge ${cls}">${h.pass}P / ${h.fail}F</span></td>
+          <td>${escapeHtml(h.duration)}</td>
+          <td>${escapeHtml(h.note || '')}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  // --- Screenshot modal ---
+  const modal = $('shot-modal');
+  const modalImg = $('modal-img');
+  const modalTitle = $('modal-title');
+  const modalCounter = $('modal-counter');
+  const modalMeta = $('modal-meta');
+  const modalNote = $('modal-note');
+  const modalFilename = $('modal-filename');
+  const btnPrev = $('modal-prev');
+  const btnNext = $('modal-next');
+  const btnClose = $('modal-close');
+
+  let activeShots = [];
+  let activeIdx = 0;
+  let activeTc = null;
+  let activeScenario = null;
+
+  function renderShot() {
+    if (!activeShots.length) return;
+    const path = activeShots[activeIdx];
+    modalImg.src = path;
+    modalImg.alt = path;
+    modalCounter.textContent = `${activeIdx + 1} / ${activeShots.length}`;
+    modalFilename.textContent = path;
+    btnPrev.disabled = activeIdx === 0;
+    btnNext.disabled = activeIdx === activeShots.length - 1;
+  }
+
+  function openModal(sIdx, tIdx) {
+    const entry = tcLookup[`${sIdx}:${tIdx}`];
+    if (!entry) return;
+    const { scenario, tc } = entry;
+    if (!tc.screenshots || !tc.screenshots.length) return;
+    activeShots = tc.screenshots;
+    activeIdx = 0;
+    activeTc = tc;
+    activeScenario = scenario;
+    const statusBadge = tc.status === 'PASS' ? '✅' : tc.status === 'FAIL' ? '❌' : '·';
+    modalTitle.innerHTML = `<span class="mono">${escapeHtml(tc.id)}</span>${statusBadge} ${escapeHtml(scenario.id)} — ${escapeHtml(tc.name)}`;
+    const runId = tc.run_id || '';
+    modalMeta.textContent = runId ? `RUN ${runId}` : 'RUN —';
+    modalNote.textContent = tc.note || '(기록된 노트 없음)';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    renderShot();
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    modalImg.src = '';
+  }
+
+  function next() { if (activeIdx < activeShots.length - 1) { activeIdx++; renderShot(); } }
+  function prev() { if (activeIdx > 0) { activeIdx--; renderShot(); } }
+
+  // 이벤트 위임 — 시나리오 리스트 영역의 has-shots 행 클릭
+  $('scenario-list').addEventListener('click', (e) => {
+    const shotCell = e.target.closest('td.tc-shots.is-clickable');
+    if (!shotCell) return;
+    openModal(Number(shotCell.dataset.sidx), Number(shotCell.dataset.tidx));
+  });
+
+  btnClose.addEventListener('click', closeModal);
+  btnPrev.addEventListener('click', prev);
+  btnNext.addEventListener('click', next);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('open')) return;
+    if (e.key === 'Escape') closeModal();
+    else if (e.key === 'ArrowRight') next();
+    else if (e.key === 'ArrowLeft') prev();
+  });
+})();
+</script>
+</body>
+</html>

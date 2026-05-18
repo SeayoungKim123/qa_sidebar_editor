@@ -5,16 +5,16 @@
 window.QA_DATA = {
   meta: {
     env: "dev",
-    run_id: "RUN-20260518-1148-dev",
-    updated_at: "2026-05-18 07:35",
+    run_id: "RUN-20260518-1540-dev",
+    updated_at: "2026-05-18 16:10",
   },
 
   kpis: {
-    total_runs: 4,
-    runs_by_env: "dev 4 · stage 0 · prd 0",
-    pass_rate: 64,
-    pass: 21,
-    fail: 12,
+    total_runs: 6,
+    runs_by_env: "dev 6 · stage 0 · prd 0",
+    pass_rate: 58,
+    pass: 19,
+    fail: 14,
     open_issues: 3,
     issues_breakdown: "도구셋 부재 1 · 복합명령 미동작 1 · 모델 라인업 불일치 1",
     scenario_count: 3,
@@ -30,7 +30,7 @@ window.QA_DATA = {
         {
           id: "TC-01", name: "표 만들기", status: "PASS",
           prompt: "여기에 3행 4열 표 만들어줘. 헤더는 이름/부서/직급/입사일",
-          duration: "",
+          duration: "25s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: [
             "RUN-20260518-1148-dev/screenshots/01-docx-tc01-02-table-inserted.png",
@@ -41,7 +41,7 @@ window.QA_DATA = {
         {
           id: "TC-02", name: "글자 크기 조정", status: "FAIL",
           prompt: "선택한 단락 글자 크기를 16pt로 키워줘",
-          duration: "",
+          duration: "110s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: [
             "RUN-20260518-1148-dev/screenshots/01-docx-tc02-04-fontsize-check.png",
@@ -51,7 +51,7 @@ window.QA_DATA = {
         {
           id: "TC-03", name: "내용 작성", status: "PASS",
           prompt: "가비아라는 IT 회사 소개를 3문단으로 작성해줘. 사업분야, 강점, 비전 순서로",
-          duration: "",
+          duration: "120s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/01-docx-tc03-03-paragraphs.png"],
           note: "사업분야·강점·비전 3문단 삽입 완료",
@@ -59,7 +59,7 @@ window.QA_DATA = {
         {
           id: "TC-04", name: "형식 맞추기", status: "PASS",
           prompt: "이 줄을 굵게 하고 가운데 정렬해줘",
-          duration: "",
+          duration: "85s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/01-docx-tc04-02-bold-center-pass.png"],
           note: "Bold·가운데 정렬 모두 적용",
@@ -67,7 +67,7 @@ window.QA_DATA = {
         {
           id: "TC-05", name: "목록 변환", status: "FAIL",
           prompt: "선택한 항목들을 글머리 기호 목록으로 만들어줘",
-          duration: "",
+          duration: "390s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: [
             "RUN-20260518-1148-dev/screenshots/01-docx-tc05-04-bullets-notpressed.png",
@@ -75,25 +75,25 @@ window.QA_DATA = {
           note: "글머리 버튼 미활성; 텍스트 • 삽입으로 네이티브 목록 미적용",
         },
         {
-          id: "TC-06", name: "복합 명령 — 표 + 서식", status: "PASS",
+          id: "TC-06", name: "복합 명령 — 표 + 서식", status: "FAIL",
           prompt: "부서별 인원 표 2행 3열 만들고, 첫 행은 굵게 + 배경색 회색으로 해줘",
-          duration: "98s",
+          duration: "120s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/01-docx-tc06-01-table-result.png"],
-          note: "표 삽입·회색 배경·헤더 굵게 시각 확인",
+          note: "표 삽입·회색 배경 시각 확인됐지만 헤더 Bold는 DOCX 네이티브 서식으로 반영되지 않음",
         },
         {
-          id: "TC-07", name: "디자인 — 표지 페이지", status: "FAIL",
+          id: "TC-07", name: "디자인 — 표지 페이지", status: "PASS",
           prompt: "문서 표지를 만들어줘. 제목 '2026 사업계획서', 부제 '가비아 AI팀', 가운데 정렬, 제목 36pt 굵게 파랑(#1E66F5), 부제 18pt 회색, 표지와 본문 사이 페이지 나누기",
-          duration: "82s",
+          duration: "250s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/01-docx-tc07-01-cover-page.png"],
-          note: "제목 파랑 시각 확인됨; 부제 회색 아닌 파랑; 툴바 폰트 미반영 (응답 82s)",
+          note: "제목 파랑·가운데 정렬, 부제 회색 계열, 표지 다음 페이지 나누기 적용 확인 (응답 82s)",
         },
         {
           id: "TC-08", name: "디자인 — 표 스타일링", status: "PASS",
           prompt: "이 표를 디자인해줘. 헤더 행은 진한 파랑 배경 + 흰 글자 굵게, 데이터 행은 짝수 행만 연회색 배경(#F5F5F5), 전체 테두리는 얇은 회색",
-          duration: "90s",
+          duration: "110s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/01-docx-tc08-01-table-styled.png"],
           note: "헤더 진한 파랑·흰 글자 시각 확인; 테두리 적용됨 (응답 90s)",
@@ -101,7 +101,7 @@ window.QA_DATA = {
         {
           id: "TC-09", name: "디자인 — 섹션 헤더 스타일", status: "FAIL",
           prompt: "문서의 모든 섹션 제목(1. xxx, 2. xxx ...)을 '제목 2' 스타일로 통일하고, 색은 짙은 남색, 위쪽에 12pt 여백 추가해줘",
-          duration: "78s",
+          duration: "240s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/01-docx-tc09-04-nav-panel.png"],
           note: "탐색창에 섹션 제목 미인식; 색상 변경만 적용 (응답 78s)",
@@ -109,7 +109,7 @@ window.QA_DATA = {
         {
           id: "TC-10", name: "비현실적 명령 — 한계 확인", status: "PASS",
           prompt: "이 문서를 PDF로 바꿔서 이메일로 보내줘",
-          duration: "78s",
+          duration: "97s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/01-docx-tc10-01-impossible-cmd.png"],
           note: "이메일 첨부 불가 안내 + 대안 제시; 본문 변경 없음 (응답 78s)",
@@ -124,7 +124,7 @@ window.QA_DATA = {
         {
           id: "TC-01", name: "슬라이드 추가", status: "PASS",
           prompt: "분기별 매출표(1Q~4Q, 매출액) 슬라이드 1장 추가해줘",
-          duration: "600s",
+          duration: "620s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: [
             "RUN-20260518-1148-dev/screenshots/02-ppt-tc01-01-slide7-progress.png",
@@ -133,19 +133,21 @@ window.QA_DATA = {
           note: "슬라이드 7 추가, 2열 5행 표·더미 수치 생성; 응답 약 10분",
         },
         {
-          id: "TC-02", name: "글자 크기 조정", status: "BLOCKED",
+          id: "TC-02", name: "글자 크기 조정", status: "FAIL",
           prompt: "선택한 제목 글자 크기를 36pt로 키우고 굵게 해줘",
-          duration: "",
-          run_id: "RUN-20260518-1148-dev",
+          duration: "60s",
+          run_id: "RUN-20260518-1540-dev",
           screenshots: [
-            "RUN-20260518-1148-dev/screenshots/02-ppt-tc02-01-slide1.png",
+            "RUN-20260518-1540-dev/screenshots/02-ppt-tc02-06-ai-result.png",
+            "RUN-20260518-1540-dev/screenshots/02-ppt-tc02-08-ai-result2.png",
+            "RUN-20260518-1540-dev/screenshots/02-ppt-tc02-09-fail-confirm.png",
           ],
-          note: "제목 텍스트박스 선택 불가; 캔버스 렌더링으로 클릭 자동화 불가",
+          note: "AI가 텍스트 선택을 감지하지 못함; 편집기 포커스 이탈 시 선택 해제되어 미적용",
         },
         {
           id: "TC-03", name: "내용 작성", status: "PASS",
           prompt: "가비아 IT 회사 소개 슬라이드 3장 만들어줘. 1)표지 2)사업분야 3)비전. 각 슬라이드 본문은 글머리 기호 3개",
-          duration: "120s",
+          duration: "720s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: [
             "RUN-20260518-1148-dev/screenshots/02-ppt-tc03-05-slides-final.png",
@@ -155,12 +157,15 @@ window.QA_DATA = {
           note: "슬라이드 3장(표지·사업분야·비전) 추가, 각 글머리 기호 포함; 응답 약 2분",
         },
         {
-          id: "TC-04", name: "형식 맞추기", status: "BLOCKED",
+          id: "TC-04", name: "형식 맞추기", status: "FAIL",
           prompt: "선택한 본문을 가운데 정렬하고 글자 색을 파랑(#1E66F5)으로 바꿔줘",
-          duration: "",
-          run_id: "RUN-20260518-1148-dev",
-          screenshots: [],
-          note: "본문 텍스트박스 선택 불가; TC-02와 동일 캔버스 자동화 한계",
+          duration: "60s",
+          run_id: "RUN-20260518-1540-dev",
+          screenshots: [
+            "RUN-20260518-1540-dev/screenshots/02-ppt-tc04-03-prompt-typed.png",
+            "RUN-20260518-1540-dev/screenshots/02-ppt-tc04-06-ai-final.png",
+          ],
+          note: "AI가 텍스트 선택을 감지하지 못함; TC-02와 동일 원인으로 미적용",
         },
         {
           id: "TC-05", name: "도형/항목 추가", status: "PASS",
@@ -176,15 +181,18 @@ window.QA_DATA = {
         {
           id: "TC-06", name: "슬라이드 통합 편집", status: "FAIL",
           prompt: "모든 슬라이드 제목을 'Pretendard' 폰트, 32pt, 굵게로 통일해줘",
-          duration: "",
-          run_id: "RUN-20260518-1148-dev",
-          screenshots: ["RUN-20260518-1148-dev/screenshots/02-ppt-tc06-02-ai-decline.png"],
-          note: "전체 폰트 통일 불가; 기존 슬라이드 교체 방식으로 내용 손상 우려",
+          duration: "60s",
+          run_id: "RUN-20260518-1540-dev",
+          screenshots: [
+            "RUN-20260518-1540-dev/screenshots/02-ppt-tc06-01-prompt-typed.png",
+            "RUN-20260518-1540-dev/screenshots/02-ppt-tc06-03-fail-confirm.png",
+          ],
+          note: "슬라이드 제목 도형 구조를 읽지 못해 기존 제목을 특정할 수 없어 일괄 편집 미적용",
         },
         {
           id: "TC-07", name: "디자인 — 테마/색상 팔레트", status: "FAIL",
           prompt: "전체 슬라이드 디자인 테마를 모던 비즈니스 스타일로 바꿔줘. 메인 색상은 짙은 남색(#0F2A5F), 강조색은 주황(#FF8A3D), 배경은 흰색, 제목은 굵은 산세리프",
-          duration: "90s",
+          duration: "540s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: [
             "RUN-20260518-1148-dev/screenshots/02-ppt-tc07-01-result.png",
@@ -194,7 +202,7 @@ window.QA_DATA = {
         {
           id: "TC-08", name: "디자인 — 표지 슬라이드", status: "PASS",
           prompt: "표지 슬라이드를 디자인해줘. 제목 'AI 문서 편집 데모', 부제 '가비아 AI팀 2026', 배경은 짙은 남색 그라데이션, 제목은 흰색 굵게 48pt, 좌측 하단에 작은 강조 도형 추가",
-          duration: "90s",
+          duration: "540s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/02-ppt-tc08-02-slide8-cover.png"],
           note: "남색 배경·흰색 제목·주황 도형 적용; 슬라이드8 대상 (응답 90s)",
@@ -202,7 +210,7 @@ window.QA_DATA = {
         {
           id: "TC-09", name: "디자인 — 강조 도형/박스", status: "PASS",
           prompt: "이 슬라이드 우측 상단에 'NEW' 라벨이 들어간 빨간색 둥근 사각형 강조 도형을 추가해줘",
-          duration: "60s",
+          duration: "360s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/02-ppt-tc09-02-slide8-new-badge.png"],
           note: "빨간 둥근 사각형 NEW 배지 우측 상단 추가; 슬라이드8 대상 (응답 60s)",
@@ -210,7 +218,7 @@ window.QA_DATA = {
         {
           id: "TC-10", name: "비대상 명령", status: "PASS",
           prompt: "이 슬라이드를 영상으로 변환해줘",
-          duration: "",
+          duration: "60s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/02-ppt-tc10-01-video-decline.png"],
           note: "영상 변환 불가 명시 안내 + 대안 제시, 슬라이드 변경 없음",
@@ -219,11 +227,11 @@ window.QA_DATA = {
     },
     {
       id: "03-AI-Excel-편집",
-      pass: 9,
+      pass: 7,
       total: 13,
       tcs: [
         {
-          id: "TC-01", name: "표 만들기", status: "FAIL",
+          id: "TC-01", name: "표 만들기", status: "PASS",
           prompt: "A1부터 C5까지 가계부 표 만들어줘. 헤더는 날짜/항목/금액, 예시 데이터 4행 채워줘",
           duration: "50s",
           run_id: "RUN-20260518-1148-dev",
@@ -231,12 +239,12 @@ window.QA_DATA = {
             "RUN-20260518-1148-dev/screenshots/03-excel-tc01-02-result.png",
             "RUN-20260518-1148-dev/screenshots/03-excel-tc01-03-date-check.png",
           ],
-          note: "헤더·4행·금액 숫자 확인; 날짜 컬럼이 텍스트로 입력됨 (응답 50s)",
+          note: "헤더·4행·금액 숫자 확인; 표 생성 요구사항 충족. 날짜 컬럼은 텍스트로 입력됨 (응답 50s)",
         },
         {
           id: "TC-02", name: "글자 크기/서식", status: "PASS",
           prompt: "선택한 헤더 행을 굵게 + 글자 크기 14pt + 배경색 연회색(#E5E5E5)으로 해줘",
-          duration: "",
+          duration: "60s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: [
             "RUN-20260518-1148-dev/screenshots/03-excel-tc02-01-result.png",
@@ -253,12 +261,12 @@ window.QA_DATA = {
           note: "B1:B12에 1월~12월 순서대로 입력; B13 비어있음 확인 (응답 약 50s)",
         },
         {
-          id: "TC-04", name: "수식 — 합계", status: "PASS",
+          id: "TC-04", name: "수식 — 합계", status: "FAIL",
           prompt: "B2부터 B10까지 합계를 B11 셀에 SUM 수식으로 넣어줘",
           duration: "40s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/03-excel-tc04-01-b11-formula.png"],
-          note: "시트2 B11에 =SUM(B2:B10) 정확히 삽입",
+          note: "시트2로 전환하지 못해 시트1 B11에 =SUM(B2:B10) 삽입",
         },
         {
           id: "TC-05", name: "셀 서식", status: "PASS",
@@ -269,12 +277,12 @@ window.QA_DATA = {
           note: "시트2 C1:C12에 ₩#,##0 서식 적용; 수식줄 숫자값 유지 확인 (응답 약 50s)",
         },
         {
-          id: "TC-06", name: "정렬/형식 맞추기", status: "PASS",
+          id: "TC-06", name: "정렬/형식 맞추기", status: "FAIL",
           prompt: "선택 영역을 가운데 정렬하고, 모든 셀에 얇은 검은색 테두리 적용해줘",
           duration: "60s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/03-excel-tc06-01-borders-no-align.png"],
-          note: "가운데 정렬 + 테두리 모두 적용",
+          note: "가운데 정렬은 미지원, 테두리만 적용됨",
         },
         {
           id: "TC-07", name: "복합 명령 — 표 + 합계 + 서식", status: "PASS",
@@ -309,12 +317,12 @@ window.QA_DATA = {
           note: "막대 차트·제목 \"상반기 매출\" 생성; A1:B7 구조 불일치로 B1:C5 적응 사용 (응답 약 150s)",
         },
         {
-          id: "TC-11", name: "차트 — 원형 그래프", status: "BLOCKED",
+          id: "TC-11", name: "차트 — 원형 그래프", status: "FAIL",
           prompt: "A10:B14 데이터로 원형 그래프(파이 차트) 만들고, 각 조각에 부서명과 백분율(%)을 데이터 레이블로 표시해줘",
           duration: "150s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/03-excel-tc11-01-pie-no-data.png"],
-          note: "A10:B14 데이터 미사전 입력; 사전조건 미달로 검증 불가 (Skill 실행 오류)",
+          note: "A10:B14 범위에 유효 데이터가 없어 파이 차트 생성 실패, AI가 범위 재요청",
         },
         {
           id: "TC-12", name: "차트 — 차트 디자인 수정", status: "FAIL",
@@ -325,12 +333,12 @@ window.QA_DATA = {
           note: "차트 서식 변경 도구 없음; 색상·축크기·격자선 3항목 미지원 (응답 약 90s)",
         },
         {
-          id: "TC-13", name: "비대상 명령", status: "PASS",
+          id: "TC-13", name: "비대상 명령", status: "FAIL",
           prompt: "이 시트를 PDF로 변환해서 다운로드 받게 해줘",
           duration: "70s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/03-excel-tc13-01-pdf-created.png"],
-          note: "PDF 파일(시트1_PDF.pdf) 생성 성공; 테스트 설계 오류 (비대상 명령 아님)",
+          note: "거절 없이 PDF 파일을 직접 생성함; 명시적 거절/안내 미노출",
         },
       ],
     },
@@ -364,8 +372,10 @@ window.QA_DATA = {
     { run_id: "RUN-20260515-1543-dev", date: "2026-05-15 15:43", env: "dev", target: "01-AI-DOCX-편집", pass: 6, fail: 3, skip: 1, duration: "~50m", note: "TC-02/05/09 FAIL, TC-08 BLOCKED" },
     { run_id: "RUN-20260515-1703-dev", date: "2026-05-15 17:03", env: "dev", target: "02-AI-PPT-편집",  pass: 1, fail: 7, skip: 2, duration: "~37m", note: "TC-10만 PASS, TC-02/04 BLOCKED" },
     { run_id: "RUN-20260515-1758-dev", date: "2026-05-15 17:58", env: "dev", target: "03-AI-Excel-편집", pass: 9, fail: 4, skip: 0, duration: "~30m", note: "TC-06/07/11/12 FAIL (AI 도구 한계)" },
-    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 02:57", env: "dev", target: "01-AI-DOCX-편집", pass: 5, fail: 5, skip: 0, duration: "~80m", note: "TC-02/05/06/07/09 FAIL; DOCX 네이티브 서식 미적용 패턴 반복" },
+    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 02:57", env: "dev", target: "01-AI-DOCX-편집", pass: 6, fail: 4, skip: 0, duration: "~80m", note: "TC-02/05/06/09 FAIL; DOCX 네이티브 서식 미적용 패턴 반복" },
     { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 04:50", env: "dev", target: "02-AI-PPT-편집",  pass: 5, fail: 5, skip: 0, duration: "~32m", note: "TC-02/04 선택 자동화 불가, TC-05 빈슬라이드 없음, TC-06/07 일괄 편집 불가" },
-    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 05:25", env: "dev", target: "03-AI-Excel-편집", pass: 6, fail: 7, skip: 0, duration: "~130m", note: "TC-01/04/06/09/11/12/13 FAIL; 날짜타입·시트전환·정렬·VLOOKUP시트명·차트서식 한계" },
+    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 05:25", env: "dev", target: "03-AI-Excel-편집", pass: 7, fail: 6, skip: 0, duration: "~130m", note: "TC-04/06/09/11/12/13 FAIL; 시트전환·정렬·VLOOKUP시트명·차트서식 한계" },
+    { run_id: "RUN-20260518-1518-dev", date: "2026-05-18 15:18", env: "dev", target: "02-AI-PPT-편집",  pass: 1, fail: 0, skip: 9, duration: "~8m", note: "TC-05 단독 PASS; 기존 슬라이드 본문 bullet 3개 삽입 확인" },
+    { run_id: "RUN-20260518-1540-dev", date: "2026-05-18 15:40", env: "dev", target: "02-AI-PPT-편집",  pass: 0, fail: 3, skip: 7, duration: "~30m", note: "TC-02/04 선택 감지 불가, TC-06 제목 도형 구조 읽기 불가" },
   ],
 };
