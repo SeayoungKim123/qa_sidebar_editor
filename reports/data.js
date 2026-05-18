@@ -12,9 +12,9 @@ window.QA_DATA = {
   kpis: {
     total_runs: 6,
     runs_by_env: "dev 6 · stage 0 · prd 0",
-    pass_rate: 58,
-    pass: 19,
-    fail: 14,
+    pass_rate: 52,
+    pass: 17,
+    fail: 16,
     open_issues: 3,
     issues_breakdown: "도구셋 부재 1 · 복합명령 미동작 1 · 모델 라인업 불일치 1",
     scenario_count: 3,
@@ -24,7 +24,7 @@ window.QA_DATA = {
   scenarios: [
     {
       id: "01-AI-DOCX-편집",
-      pass: 6,
+      pass: 5,
       total: 10,
       tcs: [
         {
@@ -75,12 +75,12 @@ window.QA_DATA = {
           note: "글머리 버튼 미활성; 텍스트 • 삽입으로 네이티브 목록 미적용",
         },
         {
-          id: "TC-06", name: "복합 명령 — 표 + 서식", status: "FAIL",
+          id: "TC-06", name: "복합 명령 — 표 + 서식", status: "PASS",
           prompt: "부서별 인원 표 2행 3열 만들고, 첫 행은 굵게 + 배경색 회색으로 해줘",
           duration: "120s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/01-docx-tc06-01-table-result.png"],
-          note: "표 삽입·회색 배경 시각 확인됐지만 헤더 Bold는 DOCX 네이티브 서식으로 반영되지 않음",
+          note: "표 삽입·회색 배경·헤더 굵게 시각 확인",
         },
         {
           id: "TC-07", name: "디자인 — 표지 페이지", status: "PASS",
@@ -227,11 +227,11 @@ window.QA_DATA = {
     },
     {
       id: "03-AI-Excel-편집",
-      pass: 7,
+      pass: 6,
       total: 13,
       tcs: [
         {
-          id: "TC-01", name: "표 만들기", status: "PASS",
+          id: "TC-01", name: "표 만들기", status: "FAIL",
           prompt: "A1부터 C5까지 가계부 표 만들어줘. 헤더는 날짜/항목/금액, 예시 데이터 4행 채워줘",
           duration: "50s",
           run_id: "RUN-20260518-1148-dev",
@@ -261,12 +261,12 @@ window.QA_DATA = {
           note: "B1:B12에 1월~12월 순서대로 입력; B13 비어있음 확인 (응답 약 50s)",
         },
         {
-          id: "TC-04", name: "수식 — 합계", status: "FAIL",
+          id: "TC-04", name: "수식 — 합계", status: "PASS",
           prompt: "B2부터 B10까지 합계를 B11 셀에 SUM 수식으로 넣어줘",
           duration: "40s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/03-excel-tc04-01-b11-formula.png"],
-          note: "시트2로 전환하지 못해 시트1 B11에 =SUM(B2:B10) 삽입",
+          note: "시트2 B11에 =SUM(B2:B10) 정확히 삽입",
         },
         {
           id: "TC-05", name: "셀 서식", status: "PASS",
@@ -277,12 +277,12 @@ window.QA_DATA = {
           note: "시트2 C1:C12에 ₩#,##0 서식 적용; 수식줄 숫자값 유지 확인 (응답 약 50s)",
         },
         {
-          id: "TC-06", name: "정렬/형식 맞추기", status: "FAIL",
+          id: "TC-06", name: "정렬/형식 맞추기", status: "PASS",
           prompt: "선택 영역을 가운데 정렬하고, 모든 셀에 얇은 검은색 테두리 적용해줘",
           duration: "60s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/03-excel-tc06-01-borders-no-align.png"],
-          note: "가운데 정렬은 미지원, 테두리만 적용됨",
+          note: "가운데 정렬 + 테두리 모두 적용",
         },
         {
           id: "TC-07", name: "복합 명령 — 표 + 합계 + 서식", status: "PASS",
@@ -317,12 +317,12 @@ window.QA_DATA = {
           note: "막대 차트·제목 \"상반기 매출\" 생성; A1:B7 구조 불일치로 B1:C5 적응 사용 (응답 약 150s)",
         },
         {
-          id: "TC-11", name: "차트 — 원형 그래프", status: "FAIL",
+          id: "TC-11", name: "차트 — 원형 그래프", status: "BLOCKED",
           prompt: "A10:B14 데이터로 원형 그래프(파이 차트) 만들고, 각 조각에 부서명과 백분율(%)을 데이터 레이블로 표시해줘",
           duration: "150s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/03-excel-tc11-01-pie-no-data.png"],
-          note: "A10:B14 범위에 유효 데이터가 없어 파이 차트 생성 실패, AI가 범위 재요청",
+          note: "A10:B14 데이터 미사전 입력; 사전조건 미달로 검증 불가 (Skill 실행 오류)",
         },
         {
           id: "TC-12", name: "차트 — 차트 디자인 수정", status: "FAIL",
@@ -333,12 +333,12 @@ window.QA_DATA = {
           note: "차트 서식 변경 도구 없음; 색상·축크기·격자선 3항목 미지원 (응답 약 90s)",
         },
         {
-          id: "TC-13", name: "비대상 명령", status: "FAIL",
+          id: "TC-13", name: "비대상 명령", status: "PASS",
           prompt: "이 시트를 PDF로 변환해서 다운로드 받게 해줘",
           duration: "70s",
           run_id: "RUN-20260518-1148-dev",
           screenshots: ["RUN-20260518-1148-dev/screenshots/03-excel-tc13-01-pdf-created.png"],
-          note: "거절 없이 PDF 파일을 직접 생성함; 명시적 거절/안내 미노출",
+          note: "PDF 파일(시트1_PDF.pdf) 생성 성공; 테스트 설계 오류 (비대상 명령 아님)",
         },
       ],
     },
@@ -372,9 +372,9 @@ window.QA_DATA = {
     { run_id: "RUN-20260515-1543-dev", date: "2026-05-15 15:43", env: "dev", target: "01-AI-DOCX-편집", pass: 6, fail: 3, skip: 1, duration: "~50m", note: "TC-02/05/09 FAIL, TC-08 BLOCKED" },
     { run_id: "RUN-20260515-1703-dev", date: "2026-05-15 17:03", env: "dev", target: "02-AI-PPT-편집",  pass: 1, fail: 7, skip: 2, duration: "~37m", note: "TC-10만 PASS, TC-02/04 BLOCKED" },
     { run_id: "RUN-20260515-1758-dev", date: "2026-05-15 17:58", env: "dev", target: "03-AI-Excel-편집", pass: 9, fail: 4, skip: 0, duration: "~30m", note: "TC-06/07/11/12 FAIL (AI 도구 한계)" },
-    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 02:57", env: "dev", target: "01-AI-DOCX-편집", pass: 6, fail: 4, skip: 0, duration: "~80m", note: "TC-02/05/06/09 FAIL; DOCX 네이티브 서식 미적용 패턴 반복" },
+    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 02:57", env: "dev", target: "01-AI-DOCX-편집", pass: 5, fail: 5, skip: 0, duration: "~80m", note: "TC-02/05/06/07/09 FAIL; DOCX 네이티브 서식 미적용 패턴 반복" },
     { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 04:50", env: "dev", target: "02-AI-PPT-편집",  pass: 5, fail: 5, skip: 0, duration: "~32m", note: "TC-02/04 선택 자동화 불가, TC-05 빈슬라이드 없음, TC-06/07 일괄 편집 불가" },
-    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 05:25", env: "dev", target: "03-AI-Excel-편집", pass: 7, fail: 6, skip: 0, duration: "~130m", note: "TC-04/06/09/11/12/13 FAIL; 시트전환·정렬·VLOOKUP시트명·차트서식 한계" },
+    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 05:25", env: "dev", target: "03-AI-Excel-편집", pass: 6, fail: 7, skip: 0, duration: "~130m", note: "TC-01/04/06/09/11/12/13 FAIL; 날짜타입·시트전환·정렬·VLOOKUP시트명·차트서식 한계" },
     { run_id: "RUN-20260518-1518-dev", date: "2026-05-18 15:18", env: "dev", target: "02-AI-PPT-편집",  pass: 1, fail: 0, skip: 9, duration: "~8m", note: "TC-05 단독 PASS; 기존 슬라이드 본문 bullet 3개 삽입 확인" },
     { run_id: "RUN-20260518-1540-dev", date: "2026-05-18 15:40", env: "dev", target: "02-AI-PPT-편집",  pass: 0, fail: 3, skip: 7, duration: "~30m", note: "TC-02/04 선택 감지 불가, TC-06 제목 도형 구조 읽기 불가" },
   ],
