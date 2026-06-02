@@ -425,12 +425,14 @@
     modalThumbs.style.display = activeShots.length > 1 ? '' : 'none';
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
     renderShot();
   }
 
   function closeModal() {
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
     modalImg.src = '';
   }
 
