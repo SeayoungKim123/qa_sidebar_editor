@@ -276,11 +276,15 @@
         const shotsCell = hasShots
           ? `<span class="tc-shots-icon">📷 ${tc.screenshots.length}</span>`
           : '';
+        const showReasonInPrompt = String(s.id || '').startsWith('02-DOCX') && tc.id === 'TC-05' && tc.note;
+        const promptCell = showReasonInPrompt
+          ? `<div class="tc-prompt-text">${escapeHtml(tc.prompt || '-')}</div><div class="tc-reason-inline"><span class="tc-reason-label">사유</span>${escapeHtml(tc.note)}</div>`
+          : escapeHtml(tc.prompt || '');
         return `
           <tr${rowAttrs}>
             <td class="tc-id">${escapeHtml(tc.id)}</td>
             <td class="tc-name">${escapeHtml(tc.name)}</td>
-            <td class="tc-prompt-col">${escapeHtml(tc.prompt || '')}</td>
+            <td class="tc-prompt-col">${promptCell}</td>
             <td class="tc-duration">${escapeHtml(tc.duration || '—')}</td>
             <td class="tc-tokens">${escapeHtml(tc.in_tokens || '—')}</td>
             <td class="tc-tokens">${escapeHtml(tc.out_tokens || '—')}</td>
