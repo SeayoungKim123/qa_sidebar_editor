@@ -198,6 +198,8 @@ TC 가 끝나는 즉시 (다음 TC 로 넘어가기 전) 다음 형식의 JSON �
 
 > ⚠️ 동시 실행 금지: 시나리오는 순차 dispatch 가정. 두 Skill 이 동시에 `data.js` 를 쓰면 race 발생.
 
+> ℹ️ 버전 스냅샷(`reports/versions/v{N}.js` · `versions.js`)은 **메인 Claude 가 RUN 종료 시 1회** 처리한다. Skill 은 `data.js`(최신)만 쓰고 버전 파일에는 관여하지 않는다.
+
 ### 3) `scenarios/{시나리오}.md` 하단 "최근 실행 결과" 표 갱신
 
 자기 시나리오 파일 하단의 표에 **이번 RUN 1줄 추가** (또는 기존 표가 빈 양식이면 첫 줄로 채움). 형식:

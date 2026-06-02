@@ -23,6 +23,12 @@
   }
   .env-badge.active { background: #dbeafe; color: #1e40af; }
   .updated { font-size: 12px; color: #64748b; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .version-select {
+    font-size: 12px; padding: 5px 10px; border-radius: 8px;
+    border: 1px solid #cbd5e1; background: #fff; color: #0f172a;
+    font-weight: 600; cursor: pointer; font-family: inherit;
+  }
 
   .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
   .card {
@@ -43,32 +49,23 @@
   .tc-block-title { font-size: 14px; font-weight: 600; color: #0f172a; }
   .tc-block-stat { font-size: 12px; color: #64748b; font-variant-numeric: tabular-nums; }
   .tc-list { width: 100%; border-collapse: collapse; }
-  .tc-list thead th {
-    text-align: left; padding: 8px 0; border-bottom: 1px solid #e2e8f0;
-    font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
-  }
+  .tc-list thead th { text-align: left; padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
   .tc-list thead th.tc-duration { text-align: right; }
+  .tc-list thead th.tc-tokens { text-align: right; }
   .tc-list thead th.tc-shots { text-align: center; }
   .tc-list thead th.tc-status { text-align: right; }
   .tc-list td { padding: 8px 0; border-bottom: 1px solid #f8fafc; font-size: 13px; vertical-align: middle; }
   .tc-list tr:last-child td { border-bottom: none; }
+  .tc-list tr.has-shots { cursor: pointer; }
+  .tc-list tr.has-shots:hover { background: #f8fafc; }
   .tc-id { font-family: "SF Mono", Consolas, "Cascadia Code", monospace; font-size: 12px; color: #475569; width: 70px; }
-  .tc-name {
-    width: 180px; color: #0f172a; padding-right: 28px;
-    white-space: normal; word-break: keep-all; line-height: 1.45;
-  }
-  .tc-prompt-col {
-    width: 48%;
-    color: #475569; font-size: 12px; line-height: 1.5;
-    white-space: normal; word-break: normal; overflow-wrap: anywhere;
-    padding-right: 12px; padding-left: 24px;
-  }
+  .tc-name { width: 180px; color: #0f172a; padding-right: 28px; white-space: normal; word-break: keep-all; line-height: 1.45; }
+  .tc-prompt-col { width: 48%; color: #475569; font-size: 12px; line-height: 1.5; white-space: normal; word-break: normal; overflow-wrap: anywhere; padding-right: 12px; padding-left: 24px; }
   .tc-shots { width: 56px; text-align: center; color: #94a3b8; font-size: 12px; white-space: nowrap; }
-  .tc-shots.is-clickable { cursor: pointer; }
-  .tc-shots.is-clickable:hover { background: #f8fafc; }
   .tc-shots-icon { display: inline-block; white-space: nowrap; }
   .tc-status { width: 80px; text-align: right; }
   .tc-duration { width: 84px; text-align: right; font-size: 12px; color: #94a3b8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tc-tokens { width: 64px; text-align: right; font-size: 12px; color: #94a3b8; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
   /* Table */
   .tbl { width: 100%; border-collapse: collapse; }
@@ -162,7 +159,10 @@
         &nbsp;<span id="run-id">아직 실행 이력이 없습니다</span>
       </div>
     </div>
-    <div class="updated">최종 업데이트: <span id="updated-at">—</span></div>
+    <div class="header-right">
+      <select id="version-select" class="version-select" style="display:none;" title="결과 버전 선택"></select>
+      <div class="updated">최종 업데이트: <span id="updated-at">—</span></div>
+    </div>
   </header>
 
   <!-- KPI Cards -->
@@ -270,52 +270,59 @@
   </div>
 </div>
 
-<script src="data.js"></script>
+<!-- 버전 매니페스트(있으면 window.QA_VERSIONS 설정). 데이터 본체는 아래 로더가 버전에 맞춰 동적 로드 -->
+<script src="versions.js"></script>
 <script>
-(function () {
-  const data = window.QA_DATA;
-  if (!data) return; // empty state already rendered in HTML
-
   const $ = (id) => document.getElementById(id);
   const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
     { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]
   ));
-  const tcPromptMap = {
-    'RUN-20260515-1543-dev:TC-01': '여기에 3행 4열 표 만들어줘. 헤더는 이름/부서/직급/입사일',
-    'RUN-20260515-1543-dev:TC-02': '선택한 단락 글자 크기를 16pt로 키워줘',
-    'RUN-20260515-1543-dev:TC-03': '가비아라는 IT 회사 소개를 3문단으로 작성해줘. 사업분야, 강점, 비전 순서로',
-    'RUN-20260515-1543-dev:TC-04': '이 줄을 굵게 하고 가운데 정렬해줘',
-    'RUN-20260515-1543-dev:TC-05': '방금 추가한 가비아 소개 3문단을 글머리 기호 목록으로 만들어줘',
-    'RUN-20260515-1543-dev:TC-06': '부서별 인원 표 2행 3열 만들고, 첫 행은 굵게 + 배경색 회색으로 해줘',
-    'RUN-20260515-1543-dev:TC-07': "문서 표지를 만들어줘. 제목 '2026 사업계획서', 부제 '가비아 AI팀', 가운데 정렬, 제목 36pt 굵게 파랑(#1E66F5), 부제 18pt 회색, 표지와 본문 사이 페이지 나누기",
-    'RUN-20260515-1543-dev:TC-08': "본문에 있는 'II. 2025년 상반기 실적 검토' 아래의 표를 디자인해줘...",
-    'RUN-20260515-1543-dev:TC-09': "문서의 모든 섹션 제목(I. xxx, II. xxx ...)을 '제목 2' 스타일로 통일하고, 색은 짙은 남색, 위쪽에 12pt 여백 추가해줘",
-    'RUN-20260515-1543-dev:TC-10': '이 문서를 PDF로 바꿔서 이메일로 보내줘',
-    'RUN-20260515-1703-dev:TC-01': '분기별 매출표(1Q~4Q, 매출액) 슬라이드 1장 추가해줘',
-    'RUN-20260515-1703-dev:TC-02': '1번 슬라이드의 제목 글자 크기를 36pt로 키우고 굵게 해줘',
-    'RUN-20260515-1703-dev:TC-03': '가비아 IT 회사 소개 슬라이드 3장 만들어줘. 1)표지 2)사업분야 3)비전. 각 슬라이드 본문은 글머리 기호 3개',
-    'RUN-20260515-1703-dev:TC-04': '2번 슬라이드 본문을 가운데 정렬하고 글자 색을 파랑(#1E66F5)으로 바꿔줘',
-    'RUN-20260515-1703-dev:TC-05': "7번 슬라이드 본문에 'AI 편집', '협업', '클라우드' 3개 항목을 글머리 기호로 추가해줘",
-    'RUN-20260515-1703-dev:TC-06': "모든 슬라이드 제목을 'Pretendard' 폰트, 32pt, 굵게로 통일해줘",
-    'RUN-20260515-1703-dev:TC-07': '전체 슬라이드 디자인 테마를 모던 비즈니스 스타일로 바꿔줘. 메인 색상은 짙은 남색(#0F2A5F), 강조색은 주황(#FF8A3D), 배경은 흰색, 제목은 굵은 산세리프',
-    'RUN-20260515-1703-dev:TC-08': "1번 표지 슬라이드를 디자인해줘. 제목 'AI 문서 편집 데모', 부제 '가비아 AI팀 2026', 배경은 짙은 남색 그라데이션, 제목은 흰색 굵게 48pt, 좌측 하단에 작은 강조 도형 추가",
-    'RUN-20260515-1703-dev:TC-09': "3번 슬라이드 우측 상단에 'NEW' 라벨이 들어간 빨간색 둥근 사각형 강조 도형을 추가해줘",
-    'RUN-20260515-1703-dev:TC-10': '이 슬라이드를 영상으로 변환해줘',
-    'RUN-20260515-1758-dev:TC-01': '시트1 A1부터 C5까지 가계부 표 만들어줘. 헤더는 날짜/항목/금액, 예시 데이터 4행 채워줘',
-    'RUN-20260515-1758-dev:TC-02': '선택한 헤더 행(시트1 A1:C1)을 굵게 + 글자 크기 14pt + 배경색 연회색(#E5E5E5)으로 해줘',
-    'RUN-20260515-1758-dev:TC-03': '시트2 B1부터 아래로 1월부터 12월까지 입력해줘',
-    'RUN-20260515-1758-dev:TC-04': '시트2 C2:C10에 임의 숫자 데이터 9행 채우고, C11 셀에 C2부터 C10까지 합계를 SUM 수식으로 넣어줘',
-    'RUN-20260515-1758-dev:TC-05': '시트2 C2:C10 선택 영역을 한국 원화(₩) 통화 형식으로 바꿔줘',
-    'RUN-20260515-1758-dev:TC-06': '시트1 A1:C5 선택 영역을 가운데 정렬하고, 모든 셀에 얇은 검은색 테두리 적용해줘',
-    'RUN-20260515-1758-dev:TC-07': '시트3 A1:C6에 3명의 1~5월 매출 표 만들고, B7~C7에 각 컬럼 합계 SUM 수식 넣고, 헤더 굵게 처리해줘',
-    'RUN-20260515-1758-dev:TC-08': "시트2의 C2:C10을 0~100 사이 점수 데이터 9개로 갱신해주고, D2:D10에 C열 점수가 60 이상이면 '합격', 미만이면 '불합격' 표시하는 IF 수식을 넣어줘",
-    'RUN-20260515-1758-dev:TC-09': '시트3 F2:G10에 사번-이름 매핑 9행 만들어줘(F열 사번 1001~1009, G열 이름). 그리고 시트3 A2에 사번 1003을 입력하고, 시트3 B2에 A2 사번에 해당하는 이름을 F:G 테이블에서 VLOOKUP으로 찾아줘.',
-    'RUN-20260515-1758-dev:TC-10': "시트4 A1:B7에 월(헤더 A1='월', B1='매출')별 매출 데이터(1월~6월, 임의 매출액)를 채우고, 이 A1:B7 데이터로 막대 차트 만들어줘. 차트 제목은 '상반기 매출', 가로축은 월, 세로축은 매출액(원)",
-    'RUN-20260515-1758-dev:TC-11': '시트4 A10:B14에 부서별 인원 데이터 채워줘(...). A10:B14 데이터로 원형 그래프(파이 차트) 만들고, 각 조각에 부서명과 백분율(%)을 데이터 레이블로 표시해줘',
-    'RUN-20260515-1758-dev:TC-12': "시트4의 '상반기 매출' 막대 차트 색상을 파랑 계열로 바꾸고, 가로축 글자 크기 12pt, 격자선 제거해줘",
-    'RUN-20260515-1758-dev:TC-13': '이 시트를 PDF로 변환해서 다운로드 받게 해줘',
-  };
-  const getTcPrompt = (tc) => tc.prompt || tcPromptMap[`${tc.run_id || ''}:${tc.id || ''}`] || '';
+
+  // --- 버전 선택기 채우기 ---
+  function populateVersionSelector(ctx) {
+    const sel = $('version-select');
+    if (!sel) return;
+    const versions = ctx && ctx.versions;
+    if (!versions || !Array.isArray(versions.list) || !versions.list.length) {
+      sel.style.display = 'none';
+      return;
+    }
+    const selected = ctx.selected || versions.current;
+    sel.innerHTML = versions.list.map((e) =>
+      `<option value="${escapeHtml(e.v)}"${e.v === selected ? ' selected' : ''}>`
+      + `${escapeHtml(e.v)} · ${escapeHtml(e.date)} · ${escapeHtml(e.env)}`
+      + `${e.v === versions.current ? ' (최신)' : ''}</option>`
+    ).join('');
+    sel.style.display = '';
+    sel.onchange = () => {
+      const params = new URLSearchParams(location.search);
+      params.set('v', sel.value);
+      location.search = params.toString(); // 새로고침으로 해당 버전 재렌더
+    };
+  }
+
+  // --- 데이터 로드 (URL ?v= 또는 최신) ---
+  (function loadVersion() {
+    const params = new URLSearchParams(location.search);
+    const versions = window.QA_VERSIONS || null;
+    let file = 'data.js';      // 기본 = 최신 라이브
+    let selected = null;
+    if (versions && Array.isArray(versions.list) && versions.list.length) {
+      selected = params.get('v') || versions.current;
+      let entry = versions.list.find((e) => e.v === selected);
+      if (!entry) { selected = versions.current; entry = versions.list.find((e) => e.v === selected); }
+      if (entry && entry.file) file = entry.file;
+    }
+    const s = document.createElement('script');
+    s.src = file;
+    s.onload = () => renderDashboard(window.QA_DATA, { versions, selected });
+    s.onerror = () => renderDashboard(null, { versions, selected });
+    document.head.appendChild(s);
+  })();
+
+  function renderDashboard(data, ctx) {
+    populateVersionSelector(ctx);
+    if (!data) return; // empty state already rendered in HTML
 
   // --- Header / meta ---
   const meta = data.meta || {};
@@ -359,8 +366,7 @@
   $('tc-count').textContent = k.tc_count ?? 0;
 
   // --- Scenarios / TC ---
-  // scenarios = 전체 카탈로그. BLOCKED 는 실행된 결과로 취급하고,
-  // null/빈값/—/미실행 만 실제 미실행으로 간주.
+  // scenarios = 전체 카탈로그. status 가 PASS/FAIL 이 아니면 (—, 미실행, null 등) 미실행으로 간주.
   // tc.screenshots (string[], optional, paths relative to reports/) 있으면 행 클릭 시 모달.
   const scenarios = data.scenarios || [];
   const aggregateCounts = scenarios.reduce((acc, s) => {
@@ -400,23 +406,15 @@
   if (scenarios.length > 0) {
     $('scenario-list').innerHTML = scenarios.map((s, sIdx) => {
       const tcs = s.tcs || [];
-      const blockedCount = tcs.filter((tc) => tc.status === 'BLOCKED').length;
-      const unrunCount = tcs.filter((tc) => {
-        const status = tc.status;
-        return status == null || status === '' || status === '—' || status === '미실행';
-      }).length;
-      const statText = unrunCount > 0
-        ? `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass · ${unrunCount} 미실행`
-        : blockedCount > 0
-          ? `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass · ${blockedCount} BLOCKED`
-          : `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass`;
+      const skipCount = tcs.filter((tc) => tc.status !== 'PASS' && tc.status !== 'FAIL').length;
+      const statText = skipCount > 0
+        ? `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass · ${skipCount} 미실행`
+        : `${s.pass ?? 0} / ${s.total ?? tcs.length} Pass`;
       const rows = tcs.map((tc, tIdx) => {
         const isPass = tc.status === 'PASS';
         const isFail = tc.status === 'FAIL';
-        const isBlocked = tc.status === 'BLOCKED';
-        const isUnrun = tc.status == null || tc.status === '' || tc.status === '—' || tc.status === '미실행';
-        const statusClass = isPass ? 'badge-pass' : isFail ? 'badge-fail' : isBlocked ? 'badge-warn' : 'badge-skip';
-        const statusText = (isPass || isFail || isBlocked) ? tc.status : '—';
+        const statusClass = isPass ? 'badge-pass' : isFail ? 'badge-fail' : 'badge-skip';
+        const statusText = (isPass || isFail) ? tc.status : '—';
         const hasShots = Array.isArray(tc.screenshots) && tc.screenshots.length > 0;
         const rowAttrs = hasShots
           ? ` class="has-shots" data-sidx="${sIdx}" data-tidx="${tIdx}" title="스크린샷 ${tc.screenshots.length}장 보기"`
@@ -424,14 +422,15 @@
         const shotsCell = hasShots
           ? `<span class="tc-shots-icon">📷 ${tc.screenshots.length}</span>`
           : '';
-        const prompt = getTcPrompt(tc);
         return `
-          <tr>
+          <tr${rowAttrs}>
             <td class="tc-id">${escapeHtml(tc.id)}</td>
             <td class="tc-name">${escapeHtml(tc.name)}</td>
-            <td class="tc-prompt-col">${escapeHtml(prompt)}</td>
+            <td class="tc-prompt-col">${escapeHtml(tc.prompt || '')}</td>
             <td class="tc-duration">${escapeHtml(tc.duration || '—')}</td>
-            <td class="tc-shots${hasShots ? ' is-clickable' : ''}"${hasShots ? ` data-sidx="${sIdx}" data-tidx="${tIdx}" title="스크린샷 ${tc.screenshots.length}장 보기"` : ''}>${shotsCell}</td>
+            <td class="tc-tokens">${escapeHtml(tc.in_tokens || '—')}</td>
+            <td class="tc-tokens">${escapeHtml(tc.out_tokens || '—')}</td>
+            <td class="tc-shots">${shotsCell}</td>
             <td class="tc-status"><span class="badge ${statusClass}">${statusText}</span></td>
           </tr>`;
       }).join('');
@@ -442,16 +441,16 @@
             <span class="tc-block-stat">${statText}</span>
           </div>
           <table class="tc-list">
-            <thead>
-              <tr>
-                <th class="tc-id">TC</th>
-                <th class="tc-name">이름</th>
-                <th class="tc-prompt-col">프롬프트</th>
-                <th class="tc-duration">AI 작업 시간</th>
-                <th class="tc-shots">샷</th>
-                <th class="tc-status">상태</th>
-              </tr>
-            </thead>
+            <thead><tr>
+              <th class="tc-id">TC</th>
+              <th class="tc-name">이름</th>
+              <th class="tc-prompt-col">프롬프트</th>
+              <th class="tc-duration">AI 작업 시간</th>
+              <th class="tc-tokens">입력</th>
+              <th class="tc-tokens">출력</th>
+              <th class="tc-shots">샷</th>
+              <th class="tc-status">상태</th>
+            </tr></thead>
             <tbody>${rows}</tbody>
           </table>
         </div>`;
@@ -550,7 +549,7 @@
     activeIdx = 0;
     activeTc = tc;
     activeScenario = scenario;
-    const statusBadge = tc.status === 'PASS' ? '✅' : tc.status === 'FAIL' ? '❌' : tc.status === 'BLOCKED' ? '⚠️' : '·';
+    const statusBadge = tc.status === 'PASS' ? '✅' : tc.status === 'FAIL' ? '❌' : '·';
     modalTitle.innerHTML = `<span class="mono">${escapeHtml(tc.id)}</span>${statusBadge} ${escapeHtml(scenario.id)} — ${escapeHtml(tc.name)}`;
     const runId = tc.run_id || '';
     modalMeta.textContent = runId ? `RUN ${runId}` : 'RUN —';
@@ -571,9 +570,9 @@
 
   // 이벤트 위임 — 시나리오 리스트 영역의 has-shots 행 클릭
   $('scenario-list').addEventListener('click', (e) => {
-    const shotCell = e.target.closest('td.tc-shots.is-clickable');
-    if (!shotCell) return;
-    openModal(Number(shotCell.dataset.sidx), Number(shotCell.dataset.tidx));
+    const tr = e.target.closest('tr.has-shots');
+    if (!tr) return;
+    openModal(Number(tr.dataset.sidx), Number(tr.dataset.tidx));
   });
 
   btnClose.addEventListener('click', closeModal);
@@ -586,7 +585,7 @@
     else if (e.key === 'ArrowRight') next();
     else if (e.key === 'ArrowLeft') prev();
   });
-})();
+  } // end renderDashboard
 </script>
 </body>
 </html>

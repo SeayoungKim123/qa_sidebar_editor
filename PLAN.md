@@ -80,6 +80,9 @@ QA-automation/
 ├── reports/               ← 테스트 실행 결과
 │   ├── STATUS.md          ← 텍스트 현황판 (항상 최신)
 │   ├── dashboard.html     ← 시각 대시보드 (브라우저)
+│   ├── data.js            ← 대시보드 데이터 (항상 최신 라이브)
+│   ├── versions.js        ← 버전 매니페스트 (window.QA_VERSIONS)
+│   ├── versions/          ← 회차별 동결 스냅샷 (v1.js, v2.js …)
 │   ├── HISTORY.md         ← 시계열 실행 로그
 │   └── RUN-{YYYYMMDD-HHMM-환경}/
 │       ├── summary.md
@@ -97,7 +100,8 @@ QA-automation/
 |---|---|---|---|
 | **현황판** | `reports/STATUS.md` | 누적 통계·진행도·통과율을 한 화면에 (텍스트) | 매 실행 후 덮어쓰기 |
 | **시각 대시보드 (구조)** | `reports/dashboard.html` | KPI·시나리오·TC·이슈·이력 표시 — 정적 구조 + 렌더링 JS | 거의 변경 X (구조 개편 시만) |
-| **시각 대시보드 (데이터)** | `reports/data.js` | `window.QA_DATA = {...}` 형태의 회차 데이터 | 매 실행 후 덮어쓰기 |
+| **시각 대시보드 (데이터)** | `reports/data.js` | `window.QA_DATA = {...}` 형태의 최신 회차 데이터 | 매 실행 후 덮어쓰기 |
+| **버전 스냅샷** | `reports/versions/v{N}.js` + `reports/versions.js` | RUN 종료 시 그 시점 `data.js` 를 동결 (과거 회차 조회용). 버전 1개 = 완료된 RUN 1개 | RUN 전체 종료 시 1회 (메인 Claude) |
 | **시계열 로그** | `reports/HISTORY.md` | 회차별 한 줄씩 append | 매 실행 후 추가 |
 | **개별 상세** | `reports/{RUN-ID}/` | 그 회차의 스크린샷·실패 로그 | 실행 시 신규 생성 |
 

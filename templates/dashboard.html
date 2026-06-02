@@ -23,6 +23,12 @@
   }
   .env-badge.active { background: #dbeafe; color: #1e40af; }
   .updated { font-size: 12px; color: #64748b; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .version-select {
+    font-size: 12px; padding: 5px 10px; border-radius: 8px;
+    border: 1px solid #cbd5e1; background: #fff; color: #0f172a;
+    font-weight: 600; cursor: pointer; font-family: inherit;
+  }
 
   .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
   .card {
@@ -153,7 +159,10 @@
         &nbsp;<span id="run-id">아직 실행 이력이 없습니다</span>
       </div>
     </div>
-    <div class="updated">최종 업데이트: <span id="updated-at">—</span></div>
+    <div class="header-right">
+      <select id="version-select" class="version-select" style="display:none;" title="결과 버전 선택"></select>
+      <div class="updated">최종 업데이트: <span id="updated-at">—</span></div>
+    </div>
   </header>
 
   <!-- KPI Cards -->
@@ -261,16 +270,59 @@
   </div>
 </div>
 
-<script src="data.js"></script>
+<!-- 버전 매니페스트(있으면 window.QA_VERSIONS 설정). 데이터 본체는 아래 로더가 버전에 맞춰 동적 로드 -->
+<script src="versions.js"></script>
 <script>
-(function () {
-  const data = window.QA_DATA;
-  if (!data) return; // empty state already rendered in HTML
-
   const $ = (id) => document.getElementById(id);
   const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
     { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]
   ));
+
+  // --- 버전 선택기 채우기 ---
+  function populateVersionSelector(ctx) {
+    const sel = $('version-select');
+    if (!sel) return;
+    const versions = ctx && ctx.versions;
+    if (!versions || !Array.isArray(versions.list) || !versions.list.length) {
+      sel.style.display = 'none';
+      return;
+    }
+    const selected = ctx.selected || versions.current;
+    sel.innerHTML = versions.list.map((e) =>
+      `<option value="${escapeHtml(e.v)}"${e.v === selected ? ' selected' : ''}>`
+      + `${escapeHtml(e.v)} · ${escapeHtml(e.date)} · ${escapeHtml(e.env)}`
+      + `${e.v === versions.current ? ' (최신)' : ''}</option>`
+    ).join('');
+    sel.style.display = '';
+    sel.onchange = () => {
+      const params = new URLSearchParams(location.search);
+      params.set('v', sel.value);
+      location.search = params.toString(); // 새로고침으로 해당 버전 재렌더
+    };
+  }
+
+  // --- 데이터 로드 (URL ?v= 또는 최신) ---
+  (function loadVersion() {
+    const params = new URLSearchParams(location.search);
+    const versions = window.QA_VERSIONS || null;
+    let file = 'data.js';      // 기본 = 최신 라이브
+    let selected = null;
+    if (versions && Array.isArray(versions.list) && versions.list.length) {
+      selected = params.get('v') || versions.current;
+      let entry = versions.list.find((e) => e.v === selected);
+      if (!entry) { selected = versions.current; entry = versions.list.find((e) => e.v === selected); }
+      if (entry && entry.file) file = entry.file;
+    }
+    const s = document.createElement('script');
+    s.src = file;
+    s.onload = () => renderDashboard(window.QA_DATA, { versions, selected });
+    s.onerror = () => renderDashboard(null, { versions, selected });
+    document.head.appendChild(s);
+  })();
+
+  function renderDashboard(data, ctx) {
+    populateVersionSelector(ctx);
+    if (!data) return; // empty state already rendered in HTML
 
   // --- Header / meta ---
   const meta = data.meta || {};
@@ -533,7 +585,7 @@
     else if (e.key === 'ArrowRight') next();
     else if (e.key === 'ArrowLeft') prev();
   });
-})();
+  } // end renderDashboard
 </script>
 </body>
 </html>

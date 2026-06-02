@@ -58,6 +58,7 @@ PM(대표님)이 자연어 시나리오만 작성하고, Claude 가 Playwright M
 | `reports/{RUN-ID}/{시나리오}_result.md` | 시나리오 종료 시 | `/qa-run` Skill |
 | `reports/data.js` (`scenarios` / `kpis` / `meta`) | **시나리오 종료 시마다 풀 빌드 + 덮어쓰기** | **`/qa-run` Skill** |
 | `reports/data.js` (`issues` / `history` / `total_runs` / `runs_by_env`) | RUN 전체 종료 시 보강 | 메인 Claude |
+| `reports/versions/v{N}.js` + `reports/versions.js` | **RUN 전체 종료 시 1회** (버전 동결) | 메인 Claude |
 | `reports/STATUS.md` | 매 실행 후 덮어쓰기 | 메인 Claude |
 | `reports/HISTORY.md` | 매 실행 후 한 줄 append | 메인 Claude |
 | `scenarios/{시나리오}.md` 하단 "최근 실행 결과" 표 | **시나리오 종료 시** (자기 시나리오만, 최신 5행 유지) | **`/qa-run` Skill** |
@@ -69,6 +70,16 @@ PM(대표님)이 자연어 시나리오만 작성하고, Claude 가 Playwright M
 - 매 실행 후 메인이 갱신하는 것은 **`reports/data.js` 한 파일뿐**. 스키마 주체는 `templates/dashboard.html` 의 렌더링 JS.
 - 마크다운에는 mermaid 등 차트 임베드 금지. 시각화는 대시보드에서만.
 - **"전체 시나리오 / TC" 영역은 카탈로그 + 오버레이**. `data.js` 의 `scenarios` 배열은 최근 회차 실행분이 아니라 `scenarios/*.md` 의 **전체 시나리오·TC 카탈로그**여야 한다. 메인 Claude 는 매 실행 후 `data.js` 작성 시 `scenarios/` 폴더를 스캔해 카탈로그를 빌드(파일명 오름차순)하고, 이번 회차 결과를 각 TC 의 `status`(`PASS`/`FAIL`/`—`)에 오버레이한다. 이번 회차에 실행되지 않은 TC 는 `status: "—"`.
+
+## 버전 관리 — 회차별 스냅샷
+
+`data.js` 는 항상 **최신 라이브** (Skill 이 시나리오마다 덮어씀). 과거 회차를 다시 보려면 **RUN 종료 시 그 시점 `data.js` 를 동결**해 둔다.
+
+- **버전 1개 = 완료된 RUN 1개.** Skill 동작은 그대로 (시나리오마다 `data.js` 풀빌드 덮어쓰기). 버전 봉인은 RUN 수명주기를 소유한 **메인 Claude** 가 RUN 끝에 1회만 수행.
+- 파일: `reports/versions/v{N}.js` (= 그 시점 `data.js` 복사, `window.QA_DATA`, 불변) + `reports/versions.js` (매니페스트, `window.QA_VERSIONS`).
+- **메인 Claude 의 RUN 종료 절차**: ① `versions.js` 읽어 `vN = 최대번호+1` 할당 → ② 최종 `reports/data.js` 를 `reports/versions/v{N}.js` 로 복사 → ③ `versions.js` 의 `list` 맨 앞에 `{ v, run_id, env, date, file }` 추가하고 `current` 를 `vN` 으로 갱신. **6개 시나리오 모두 끝난 뒤 1번** (일부만 돌린 RUN 이면 그 버전엔 안 돌린 TC 가 `—` 로 남음).
+- 라벨 형식: `v{N} · {YYYY-MM-DD} · {env}` (예: `v2 · 2026-06-03 · dev`).
+- `dashboard.html` 은 `versions.js` 를 읽어 버전 선택기를 그리고, 선택 시 `?v=vN` 새로고침으로 해당 스냅샷을 로드한다. 매니페스트가 없으면 선택기 숨김 + `data.js` 만 로드 (하위호환).
 
 ## Playwright MCP
 
