@@ -51,14 +51,26 @@ model: sonnet
 시나리오 명세의 "기대 결과" 와 실제 화면을 비교. 일치하면 `PASS`, 다르면 `FAIL`.
 
 ### 4) 스크린샷 저장
-핵심 단계마다 `reports/{RUN-ID}/screenshots/` 에 PNG 저장.
+`reports/{RUN-ID}/screenshots/` 에 PNG 저장.
 **파일명 규칙**: `{scenario-slug}-{tc-id}-{step}-{설명}.png`
-예: `signup-tc04-01-resend-click.png`
+예: `signup-tc04-02-prompt.png`
 
-**캡처 범위 규칙**:
+#### 캡처 시점 — TC 당 최소 3장 (`01-before` → `02-prompt` → `03-after`)
+
+| step | 시점 | 무엇을 담나 | 적용 |
+|---|---|---|---|
+| `01-before` | 작업 시작 전 | 기준 상태 (편집 전 본문·시트·슬라이드) | **항상** |
+| `02-prompt` | 프롬프트 입력 직후·전송 전 | 채팅창에 입력된 프롬프트 텍스트 (무엇을 보냈는지 박제) | 프롬프트 있는 TC만 |
+| `03-after` | 작업 완료 후 | 결과 — 검증 포인트가 보이는 화면 | **항상** |
+
+- **`02-prompt` 생략**: 저장/영속 TC 처럼 프롬프트가 없는 TC 는 2번을 건너뛴다. 이 경우 `01-before` = 동작 직전, `03-after` = 동작 후(영속이면 **재오픈 후**).
+- **`03-after` 다장화 (스크롤·다중 객체)**: 검증 포인트가 한 화면을 넘으면 **화면을 넘길 때마다**(스크롤 / 슬라이드 이동 / 시트·차트 전환) 추가 캡처. 파일명은 `03-after`, `03b-after`, `03c-after` … 로 잇는다. **모든 검증 포인트가 적어도 한 장에는 보여야 한다** (예: Excel 차트 3개, PPT 슬라이드 순회, 긴 표).
+- **FAIL 일 때**: `03-after` 계열 중 **무엇이 어떻게 안 됐는지 보이는 화면 최소 1장**을 반드시 포함.
+
+#### 캡처 범위 규칙
 - **기본은 전체 뷰포트** — `browser_take_screenshot` 호출 시 `element` / `ref` 파라미터를 **주지 않는다**. 그래야 본문 + 사이드패널 + 상단 메뉴가 한 장에 잡혀 증거로서 의미가 있다.
-- AI 응답 토큰 수, 작은 다이얼로그처럼 **의도적으로 일부만 크롭**해야 검증이 더 명확한 경우에만 `element` 로 스코프. 이 경우 파일명에 `-zoom` 같은 suffix 로 표시 (예: `01-docx-tc01-03-ai-panel-zoom.png`).
-- 페이지 전체(스크롤 영역 포함)가 필요하면 `fullPage: true` 사용. iframe 안의 canvas(OnlyOffice 본문) 는 fullPage 가 잡지 못하므로 본문 검증용으로는 큰 뷰포트 + 일반 스크린샷이 더 적합.
+- AI 응답 토큰 수, 작은 다이얼로그처럼 **의도적으로 일부만 크롭**해야 검증이 더 명확한 경우에만 `element` 로 스코프. 이 경우 파일명에 `-zoom` 같은 suffix 로 표시 (예: `01-docx-tc01-03-after-ai-panel-zoom.png`).
+- 페이지 전체(스크롤 영역 포함)가 필요하면 `fullPage: true` 사용. 단 iframe 안의 canvas(OnlyOffice 본문) 는 fullPage 가 잡지 못하므로, 본문이 1화면을 넘으면 위 `03-after` 다장화(스크롤하며 일반 스크린샷 여러 장)로 커버한다.
 
 ### 5) **즉시 기록 — `progress.jsonl` 에 1줄 append**
 
