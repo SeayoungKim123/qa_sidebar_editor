@@ -25,9 +25,9 @@
   <!-- KPI Cards -->
   <div class="kpis">
     <div class="card">
-      <div class="kpi-label">최근 회차 통과율</div>
-      <div class="kpi-value muted" id="pass-rate">—</div>
-      <div class="kpi-sub" id="pass-fail">실행 후 표시</div>
+      <div class="kpi-label">QA 판정</div>
+      <div class="kpi-value muted" id="qa-status">보류</div>
+      <div class="kpi-sub" id="qa-status-detail">실행 후 표시</div>
     </div>
     <div class="card">
       <div class="kpi-label">미해결 이슈</div>
@@ -35,9 +35,9 @@
       <div class="kpi-sub" id="issues-breakdown">실행 후 표시</div>
     </div>
     <div class="card">
-      <div class="kpi-label">시나리오 / TC</div>
-      <div class="kpi-value"><span id="scenario-count">0</span> <span style="font-size:18px;color:#94a3b8;font-weight:500;">/ <span id="tc-count">0</span></span></div>
-      <div class="kpi-sub">시나리오 / 테스트 케이스</div>
+      <div class="kpi-label">테스트 진행</div>
+      <div class="kpi-value"><span id="executed-count">0</span> <span style="font-size:18px;color:#94a3b8;font-weight:500;">/ <span id="tc-count">0</span></span></div>
+      <div class="kpi-sub" id="progress-breakdown">0 PASS · 0 FAIL · 0 미실행</div>
     </div>
   </div>
 
@@ -172,29 +172,6 @@
   if (meta.run_id) docTitle += ' — ' + meta.run_id;
   document.title = docTitle;
 
-  // --- KPIs ---
-  const k = data.kpis || {};
-  if (typeof k.pass_rate === 'number') {
-    const pr = $('pass-rate');
-    pr.textContent = k.pass_rate + '%';
-    pr.classList.remove('muted');
-    pr.style.color = k.pass_rate >= 90 ? '#10b981'
-                   : k.pass_rate >= 70 ? '#f59e0b'
-                   : '#ef4444';
-  }
-  if (typeof k.pass === 'number') {
-    $('pass-fail').textContent = k.pass + ' Pass · ' + (k.fail ?? 0) + ' Fail';
-  }
-
-  if (typeof k.open_issues === 'number') {
-    const oi = $('open-issues');
-    oi.textContent = k.open_issues;
-    if (k.open_issues > 0) oi.style.color = '#ef4444';
-  }
-  if (k.issues_breakdown) $('issues-breakdown').textContent = k.issues_breakdown;
-  $('scenario-count').textContent = k.scenario_count ?? 0;
-  $('tc-count').textContent = k.tc_count ?? 0;
-
   // --- Scenarios / TC ---
   // scenarios = 전체 카탈로그. status 가 PASS/FAIL 이 아니면 (—, 미실행, null 등) 미실행으로 간주.
   // tc.screenshots (string[], optional, paths relative to reports/) 있으면 행 클릭 시 모달.
@@ -210,9 +187,7 @@
     });
     return acc;
   }, { pass: 0, fail: 0, blocked: 0, unrun: 0, total: 0 });
-  const computedPassRate = (aggregateCounts.pass + aggregateCounts.fail) > 0
-    ? Math.round((aggregateCounts.pass / (aggregateCounts.pass + aggregateCounts.fail)) * 100)
-    : null;
+  const executedCount = aggregateCounts.pass + aggregateCounts.fail + aggregateCounts.blocked;
   // (scenarioIdx, tcIdx) → tc 로 빠르게 찾기 위한 lookup
   const tcLookup = {};
   scenarios.forEach((s, sIdx) => {
@@ -221,17 +196,62 @@
     });
   });
 
-  const passRateEl = $('pass-rate');
-  if (typeof computedPassRate === 'number') {
-    passRateEl.textContent = computedPassRate + '%';
-    passRateEl.classList.remove('muted');
-    passRateEl.style.color = computedPassRate >= 90 ? '#10b981'
-                         : computedPassRate >= 70 ? '#f59e0b'
-                         : '#ef4444';
+  // --- KPIs ---
+  const k = data.kpis || {};
+  const unresolvedIssues = (data.issues || []).filter((issue) => issue.status !== 'resolved');
+  const openIssueCount = typeof k.open_issues === 'number' ? k.open_issues : unresolvedIssues.length;
+  const hasFailures = aggregateCounts.fail > 0;
+  const hasBlocked = aggregateCounts.blocked > 0;
+  const hasUnrun = aggregateCounts.unrun > 0;
+  const statusEl = $('qa-status');
+  const statusDetailEl = $('qa-status-detail');
+  let qaStatus = '보류';
+  let qaStatusColor = '#94a3b8';
+  let qaStatusDetail = '아직 실행 결과가 없습니다';
+
+  if (executedCount === 0) {
+    qaStatus = '보류';
+    qaStatusColor = '#94a3b8';
+    qaStatusDetail = '아직 실행 결과가 없습니다';
+  } else if (hasBlocked) {
+    qaStatus = '보류';
+    qaStatusColor = '#64748b';
+    qaStatusDetail = `차단된 테스트 ${aggregateCounts.blocked}건으로 판정을 보류합니다`;
+  } else if (hasFailures) {
+    qaStatus = '실패';
+    qaStatusColor = '#ef4444';
+    qaStatusDetail = `실패 ${aggregateCounts.fail}건${openIssueCount > 0 ? ` · 미해결 이슈 ${openIssueCount}건` : ''}`;
+  } else if (hasUnrun || openIssueCount > 0) {
+    qaStatus = '주의';
+    qaStatusColor = '#f59e0b';
+    if (hasUnrun) {
+      qaStatusDetail = '실패는 없지만 미실행 테스트가 남아 있습니다';
+    } else {
+      qaStatusDetail = `실패는 없지만 미해결 이슈 ${openIssueCount}건이 남아 있습니다`;
+    }
+  } else {
+    qaStatus = '통과';
+    qaStatusColor = '#10b981';
+    qaStatusDetail = '실행된 테스트와 미해결 이슈 기준으로 이상이 없습니다';
   }
-  $('pass-fail').textContent = `${aggregateCounts.pass} PASS, ${aggregateCounts.fail} FAIL`;
-  $('scenario-count').textContent = scenarios.length;
+
+  statusEl.textContent = qaStatus;
+  statusEl.classList.remove('muted');
+  statusEl.style.color = qaStatusColor;
+  statusDetailEl.textContent = qaStatusDetail;
+
+  const oi = $('open-issues');
+  oi.textContent = openIssueCount;
+  oi.style.color = openIssueCount > 0 ? '#ef4444' : '#10b981';
+  $('issues-breakdown').textContent = k.issues_breakdown || (openIssueCount > 0 ? '세부 이슈는 아래 표에서 확인' : '미해결 이슈가 없습니다');
+
+  $('executed-count').textContent = executedCount;
   $('tc-count').textContent = aggregateCounts.total;
+  $('progress-breakdown').textContent = [
+    `${aggregateCounts.pass} PASS`,
+    `${aggregateCounts.fail} FAIL`,
+    hasBlocked ? `${aggregateCounts.blocked} BLOCKED` : `${aggregateCounts.unrun} 미실행`,
+  ].join(' · ');
 
   if (scenarios.length > 0) {
     $('scenario-list').innerHTML = scenarios.map((s, sIdx) => {
@@ -302,7 +322,7 @@
   }
 
   // --- Issues ---
-  const issues = data.issues || [];
+  const issues = unresolvedIssues;
   $('issues-title').textContent = '미해결 이슈' + (issues.length > 0 ? ` (${issues.length}건)` : '');
   if (issues.length > 0) {
     $('issues-body').innerHTML = issues.map((i) => {
