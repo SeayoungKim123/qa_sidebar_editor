@@ -24,7 +24,7 @@ h1 { font-size: 26px; font-weight: 700; }
   font-weight: 600; cursor: pointer; font-family: inherit;
 }
 
-.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
 .card {
   background: white; border-radius: 12px; padding: 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,.05);
@@ -83,6 +83,14 @@ h1 { font-size: 26px; font-weight: 700; }
 
 .section-card { margin-bottom: 24px; }
 footer { margin-top: 32px; text-align: center; color: #94a3b8; font-size: 12px; }
+
+@media (max-width: 960px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .kpis { grid-template-columns: 1fr; }
+}
 
 /* Screenshot modal */
 .modal-backdrop {
