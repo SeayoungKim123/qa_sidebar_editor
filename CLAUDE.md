@@ -34,6 +34,12 @@ PM(대표님)이 자연어 시나리오만 작성하고, Claude 가 Playwright M
 - 메인 Claude 의 책임은 **dispatch + 집계**뿐. 실제 브라우저 조작·검증은 절대 메인에서 하지 말 것 (컨텍스트 보호).
 - 격리 단위는 시나리오. 사전조건 공유 이득이 격리 손실보다 크면 재평가.
 
+> 🚨 **격리 트립와이어 — 메인은 `mcp__playwright__*` 를 단 한 번도 직접 호출하지 않는다.**
+> 시나리오를 실행하려면 **반드시 `Skill` 도구로 `qa-run` 을 invoke** 한다 (frontmatter `context: fork` 가 격리 컨텍스트를 띄움). `browser_navigate`/`browser_snapshot`/`browser_take_screenshot` 등은 **fork 안에서만** 돈다.
+> - **자가점검**: 메인 턴에서 `mcp__playwright__*` 를 부르려는 손이 나가면 **그 자체가 dispatch 누락 신호**다. 멈추고 `Skill(qa-run, …)` 으로 위임하라. 메인이 스냅샷·스크린샷을 받기 시작하면 컨텍스트가 회차당 수십만 토큰으로 폭발한다(실측: 47 TC 인라인 → 메인 79% 점유).
+> - **증상**: 메인 `/context` 의 Messages 가 수십만 토큰이면 격리가 깨진 것. 정상이면 메인엔 300단어 요약만 누적돼 47 TC 풀실행에도 한 자릿수 % 에 머문다.
+> - 시나리오 6개면 `Skill` invoke 도 6번. 한 번의 invoke 가 한 시나리오의 모든 TC·캡처를 fork 안에서 끝내고 요약만 돌려준다.
+
 ## RUN-ID 규칙
 
 `RUN-YYYYMMDD-HHMM-{환경}` — 예: `RUN-20260502-1430-dev`. 메인이 생성해 모든 하위 산출물에서 동일하게 사용.
