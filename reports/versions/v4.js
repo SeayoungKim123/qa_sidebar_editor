@@ -324,7 +324,7 @@ window.QA_DATA = {
         {
           id: "TC-05", name: "통화 형식 적용", status: "PASS",
           prompt: "선택한 매출 셀들을 한국 원화(₩) 통화 형식으로 바꿔줘",
-          duration: "44s",
+          duration: "44s", in_tokens: "824", out_tokens: "515",
           run_id: "RUN-20260602-1405-dev",
           screenshots: [
             "RUN-20260602-1405-dev/screenshots/05-excel-tc05-02-prompt.png",
@@ -357,7 +357,7 @@ window.QA_DATA = {
         {
           id: "TC-08", name: "막대 차트 생성", status: "PASS",
           prompt: "직원별 1~3월 매출 데이터로 막대 차트를 만들어줘. 차트 제목은 '1분기 매출', 가로축은 직원, 세로축은 매출액",
-          duration: "45s",
+          duration: "45s", in_tokens: "1.1k", out_tokens: "584",
           run_id: "RUN-20260602-1405-dev",
           screenshots: [
             "RUN-20260602-1405-dev/screenshots/05-excel-tc08-02-prompt.png",
@@ -398,7 +398,7 @@ window.QA_DATA = {
         {
           id: "TC-02", name: "막대 차트 생성", status: "PASS",
           prompt: "직원별 1~3월 매출 데이터로 막대 차트를 만들어줘. 제목 '1분기 매출', 가로축 직원, 세로축 매출액",
-          duration: "49s",
+          duration: "49s", in_tokens: "8.9k", out_tokens: "1.4k",
           run_id: "RUN-20260602-1405-dev",
           screenshots: [
             "RUN-20260602-1405-dev/screenshots/06-excel-tc02-02-prompt.png",
@@ -409,7 +409,7 @@ window.QA_DATA = {
         {
           id: "TC-03", name: "원형 차트 생성", status: "PASS",
           prompt: "각 직원의 총합(E열) 비중을 보여주는 원형 차트를 추가해줘. 제목 '직원별 매출 비중'",
-          duration: "53s",
+          duration: "53s", in_tokens: "8.4k", out_tokens: "1.4k",
           run_id: "RUN-20260602-1405-dev",
           screenshots: [
             "RUN-20260602-1405-dev/screenshots/06-excel-tc03-02-prompt.png",
@@ -420,7 +420,7 @@ window.QA_DATA = {
         {
           id: "TC-04", name: "꺾은선 차트 생성", status: "PASS",
           prompt: "직원별 1~3월 매출 추이를 꺾은선 차트로 만들어줘. 직원별로 선 1개씩, 가로축은 월",
-          duration: "52s",
+          duration: "52s", in_tokens: "8.4k", out_tokens: "889",
           run_id: "RUN-20260602-1405-dev",
           screenshots: [
             "RUN-20260602-1405-dev/screenshots/06-excel-tc04-02-prompt.png",
@@ -431,7 +431,7 @@ window.QA_DATA = {
         {
           id: "TC-05", name: "차트 디자인 수정", status: "FAIL",
           prompt: "막대 차트('1분기 매출') 색상을 파랑 계열로 바꾸고, 가로축 글자 크기 12pt, 격자선을 제거해줘",
-          duration: "46s",
+          duration: "46s", in_tokens: "6.4k", out_tokens: "615",
           run_id: "RUN-20260602-1405-dev",
           screenshots: [
             "RUN-20260602-1405-dev/screenshots/06-excel-tc05-02-prompt.png",
@@ -442,7 +442,7 @@ window.QA_DATA = {
         {
           id: "TC-06", name: "행 삽입 + 셀 병합 (수식·차트 참조 보정)", status: "PASS",
           prompt: "1행 위에 '1분기 매출 현황'이라는 제목 행을 추가하고, A~E 열을 하나로 병합해서 가운데 정렬해줘",
-          duration: "55s",
+          duration: "55s", in_tokens: "10.3k", out_tokens: "2.8k",
           run_id: "RUN-20260602-1405-dev",
           screenshots: [
             "RUN-20260602-1405-dev/screenshots/06-excel-tc06-02-prompt.png",
