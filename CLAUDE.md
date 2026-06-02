@@ -46,7 +46,7 @@ PM(대표님)이 자연어 시나리오만 작성하고, Claude 가 Playwright M
 | `scenarios/` | O | 자연어 테스트 시나리오. **핵심 자산.** `_template.md` 골격 사용. |
 | `environments/_template.md` | O | 환경 양식만 추적 |
 | `environments/{dev,stage,prd}.md` | **X (gitignored)** | 민감정보 (URL·계정·테스트카드). 절대 커밋·요약·로그에 노출 금지. |
-| `templates/` | O | **빈 양식 source of truth.** `dashboard.html` · `data.js` · `STATUS.md` · `HISTORY.md`. |
+| `templates/` | O | **빈 양식 source of truth.** `dashboard.html` · `dashboard.css` · `data.js` · `STATUS.md` · `HISTORY.md`. |
 | `reports/` | O | 실행 산출물 (RUN 폴더·스크린샷·대시보드·STATUS/HISTORY). 추적해 이력 보존. 첫 실행 시 메인 Claude 가 `templates/` → `reports/` 로 복사. |
 | `_sample/` | O | 시나리오·리포트 예시 (가상 데이터). 양식 미리보기용. |
 
@@ -66,7 +66,7 @@ PM(대표님)이 자연어 시나리오만 작성하고, Claude 가 Playwright M
 
 ## 시각화 정책
 
-- 단일 HTML 대시보드 + `data.js` 분리 구조. **`dashboard.html` 은 구조·렌더링 JS 만, 데이터는 전부 `data.js`** (`window.QA_DATA`).
+- 단일 HTML 대시보드 + `dashboard.css` + `data.js` 분리 구조. **`dashboard.html` 은 구조·렌더링 JS 만, 스타일은 전부 `dashboard.css`, 데이터는 전부 `data.js`** (`window.QA_DATA`).
 - 매 실행 후 메인이 갱신하는 것은 **`reports/data.js` 한 파일뿐**. 스키마 주체는 `templates/dashboard.html` 의 렌더링 JS.
 - 마크다운에는 mermaid 등 차트 임베드 금지. 시각화는 대시보드에서만.
 - **"전체 시나리오 / TC" 영역은 카탈로그 + 오버레이**. `data.js` 의 `scenarios` 배열은 최근 회차 실행분이 아니라 `scenarios/*.md` 의 **전체 시나리오·TC 카탈로그**여야 한다. 메인 Claude 는 매 실행 후 `data.js` 작성 시 `scenarios/` 폴더를 스캔해 카탈로그를 빌드(파일명 오름차순)하고, 이번 회차 결과를 각 TC 의 `status`(`PASS`/`FAIL`/`—`)에 오버레이한다. 이번 회차에 실행되지 않은 TC 는 `status: "—"`.

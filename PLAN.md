@@ -79,7 +79,8 @@ QA-automation/
 │   └── prd.md
 ├── reports/               ← 테스트 실행 결과
 │   ├── STATUS.md          ← 텍스트 현황판 (항상 최신)
-│   ├── dashboard.html     ← 시각 대시보드 (브라우저)
+│   ├── dashboard.html     ← 시각 대시보드 (구조 + 렌더링 JS)
+│   ├── dashboard.css      ← 대시보드 스타일 (분리)
 │   ├── data.js            ← 대시보드 데이터 (항상 최신 라이브)
 │   ├── versions.js        ← 버전 매니페스트 (window.QA_VERSIONS)
 │   ├── versions/          ← 회차별 동결 스냅샷 (v1.js, v2.js …)
@@ -110,7 +111,7 @@ QA-automation/
 **시각화 정책**: `dashboard.html` 은 구조만 담는 정적 자산이고, 매 실행 후 메인 Claude 가 갱신하는 것은 `data.js` 한 파일뿐.
 
 **source of truth**: 빈 양식 일체는 `templates/` 가 source of truth (추적 O).
-- `templates/dashboard.html` · `templates/STATUS.md` · `templates/HISTORY.md` · `templates/data.js`
+- `templates/dashboard.html` · `templates/dashboard.css` · `templates/STATUS.md` · `templates/HISTORY.md` · `templates/data.js`
 - `reports/` 는 전체 ignore (휘발성). 첫 실행 또는 파일 누락 시 메인 Claude 가 `templates/` → `reports/` 로 복사. 매 실행 후 `reports/data.js` 만 새 데이터로 덮어쓰기.
 
 **양식 미리보기**: `_sample/reports/` 참조 (self-contained, 추적 O).
