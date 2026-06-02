@@ -83,10 +83,10 @@ PM(대표님)이 자연어 시나리오만 작성하고, Claude 가 Playwright M
 TC 1개 끝날 때마다 즉시 1줄 append (다음 TC 진행 전). 중간 중단되어도 직전까지 결과 보존이 목적이므로 **건너뛰기 절대 금지**.
 
 ```json
-{"ts":"2026-05-02T14:30:42","run_id":"RUN-20260502-1430-dev","scenario":"01-회원가입","tc":"TC-01","result":"PASS","wait_ms":3214,"screenshot":["screenshots/signup-tc01-01-before.png"],"note":""}
+{"ts":"2026-05-02T14:30:42","run_id":"RUN-20260502-1430-dev","scenario":"01-회원가입","tc":"TC-01","result":"PASS","wait_ms":3214,"in_tokens":1280,"out_tokens":3450,"screenshot":["screenshots/signup-tc01-01-before.png"],"note":""}
 ```
 
-`result`: `PASS` / `FAIL` / `SKIP` / `BLOCKED`(선행 TC 의존 실패). `wait_ms`: AI 작업 시간(프롬프트 전송→편집 완료) 실측, `browser_evaluate(Date.now())` 두 번 차이. 없으면 `null`.
+`result`: `PASS` / `FAIL` / `SKIP` / `BLOCKED`(선행 TC 의존 실패). `wait_ms`: AI 작업 시간(프롬프트 전송→편집 완료) 실측, `browser_evaluate(Date.now())` 두 번 차이. 없으면 `null`. `in_tokens`/`out_tokens`: 응답 완료 후 사이드패널 하단에서 읽은 입력·출력 토큰(정수). 없으면 `null`.
 
 ## 메인 ↔ Skill 반환 경계
 

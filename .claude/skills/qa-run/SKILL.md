@@ -47,6 +47,10 @@ model: sonnet
   - `wait_ms = t_done - t_send`
   - **"완료" 판단은 블랙박스 근사**: AI 응답 스트리밍이 멈추고 **+** 본문(문서/시트/슬라이드)에 결과가 반영된 시점. 그 순간 곧바로 시계를 읽는다 (스크린샷·검증보다 먼저).
   - 프롬프트 없는 TC(저장/영속 등)는 동작 시작~완료를 같은 방식으로 재되, 측정할 AI 동작이 없으면 `wait_ms: null`.
+- **토큰 소모량 측정 (= 유저 비용 지표)**:
+  - AI 응답이 완료되면 사이드패널 **응답 영역 하단에 입력·출력 토큰 수가 표시**된다. `wait_ms` 시계를 읽은 직후, `browser_snapshot` 또는 토큰 영역 크롭 스크린샷(`-tokens-zoom`)으로 두 값을 읽는다.
+  - `in_tokens` = 입력(프롬프트) 토큰, `out_tokens` = 출력(응답) 토큰. **정수 그대로** 기록 (예: `1280`).
+  - 패널에 토큰이 표시되지 않거나 프롬프트 없는 TC 면 둘 다 `null`.
 
 ### 2) Playwright MCP 로 브라우저 조작
 시나리오에 적힌 단계대로 다음 도구들을 사용:
@@ -86,12 +90,13 @@ model: sonnet
 TC 가 끝나는 즉시 (다음 TC 로 넘어가기 전) 다음 형식의 JSON 한 줄을 파일 끝에 추가:
 
 ```json
-{"ts":"2026-05-02T14:30:42","run_id":"RUN-20260502-1430-dev","scenario":"01-회원가입","tc":"TC-01","result":"PASS","wait_ms":3214,"screenshot":["screenshots/signup-tc01-01-before.png"],"note":""}
+{"ts":"2026-05-02T14:30:42","run_id":"RUN-20260502-1430-dev","scenario":"01-회원가입","tc":"TC-01","result":"PASS","wait_ms":3214,"in_tokens":1280,"out_tokens":3450,"screenshot":["screenshots/signup-tc01-01-before.png"],"note":""}
 ```
 
 필드 설명:
 - `result`: `"PASS"` / `"FAIL"` / `"SKIP"` / `"BLOCKED"` (선행 TC 결과에 의존해 실행 불가한 경우)
 - `wait_ms`: **AI 작업 시간** — 프롬프트 전송→편집 완료 실측(밀리초, `browser_evaluate(Date.now())` 두 번 차이). 측정할 AI 동작이 없으면 `null`
+- `in_tokens` / `out_tokens`: **토큰 소모량** — 응답 완료 후 사이드패널 하단에서 읽은 입력·출력 토큰(정수). 표시 없거나 프롬프트 없는 TC 면 각각 `null`
 - `note`: 아래 **note 작성 규칙** 참조
 - `screenshot`: 관련 스크린샷 상대경로 배열
 
@@ -179,6 +184,7 @@ TC 가 끝나는 즉시 (다음 TC 로 넘어가기 전) 다음 형식의 JSON �
      - `note`: progress.jsonl 의 `note` 그대로.
      - `run_id`: 결과를 가져온 RUN-ID.
      - `duration`: **AI 작업 시간** — progress.jsonl 의 `wait_ms` 를 `"{round(wait_ms/1000)}s"` 로 변환 (예: `3214` → `"3s"`). `wait_ms` 가 `null`/누락이면 이 필드 생략 (대시보드가 `—` 표시).
+     - `in_tokens` / `out_tokens`: **토큰 소모량** — progress.jsonl 의 `in_tokens`·`out_tokens`(정수)를 1000 단위 축약 문자열로 변환 (예: `1280` → `"1.3k"`, `850` → `"850"`). 각각 `null`/누락이면 해당 필드 생략 (대시보드가 `—` 표시).
      - 결과 없음 TC 는 이 필드들 모두 생략.
 4. **KPI 재계산** (`kpis` 객체):
    - `pass`: 전체 PASS 개수

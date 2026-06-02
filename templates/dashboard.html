@@ -45,6 +45,7 @@
   .tc-list { width: 100%; border-collapse: collapse; }
   .tc-list thead th { text-align: left; padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
   .tc-list thead th.tc-duration { text-align: right; }
+  .tc-list thead th.tc-tokens { text-align: right; }
   .tc-list thead th.tc-shots { text-align: center; }
   .tc-list thead th.tc-status { text-align: right; }
   .tc-list td { padding: 8px 0; border-bottom: 1px solid #f8fafc; font-size: 13px; vertical-align: middle; }
@@ -58,6 +59,7 @@
   .tc-shots-icon { display: inline-block; white-space: nowrap; }
   .tc-status { width: 80px; text-align: right; }
   .tc-duration { width: 84px; text-align: right; font-size: 12px; color: #94a3b8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tc-tokens { width: 64px; text-align: right; font-size: 12px; color: #94a3b8; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
   /* Table */
   .tbl { width: 100%; border-collapse: collapse; }
@@ -374,6 +376,8 @@
             <td class="tc-name">${escapeHtml(tc.name)}</td>
             <td class="tc-prompt-col">${escapeHtml(tc.prompt || '')}</td>
             <td class="tc-duration">${escapeHtml(tc.duration || '—')}</td>
+            <td class="tc-tokens">${escapeHtml(tc.in_tokens || '—')}</td>
+            <td class="tc-tokens">${escapeHtml(tc.out_tokens || '—')}</td>
             <td class="tc-shots">${shotsCell}</td>
             <td class="tc-status"><span class="badge ${statusClass}">${statusText}</span></td>
           </tr>`;
@@ -390,6 +394,8 @@
               <th class="tc-name">이름</th>
               <th class="tc-prompt-col">프롬프트</th>
               <th class="tc-duration">AI 작업 시간</th>
+              <th class="tc-tokens">입력</th>
+              <th class="tc-tokens">출력</th>
               <th class="tc-shots">샷</th>
               <th class="tc-status">상태</th>
             </tr></thead>
