@@ -92,7 +92,7 @@ PM(대표님)이 자연어 시나리오만 작성하고, Claude 가 Playwright M
 `.mcp.json` 에 `playwright` 서버 등록 (`@playwright/mcp@latest`). `.claude/settings.local.json` 에서 활성화 상태. `/qa-run` Skill 안에서만 사용:
 - `browser_navigate` / `browser_click` / `browser_type` / `browser_press_key` — 인터랙션
 - `browser_snapshot` — 접근성 트리 기반 검증
-- `browser_take_screenshot` — `reports/{RUN-ID}/screenshots/` 에 PNG 저장. 파일명: `{scenario-slug}-{tc-id}-{step}-{설명}.png`. **TC 당 최소 3시점**: `01-before`(시작 전) → `02-prompt`(프롬프트 입력 직후, 프롬프트 있을 때) → `03-after`(완료 후). 결과가 1화면을 넘으면 `03b-after`·`03c-after`… 로 다장 캡처. 상세 규칙은 `/qa-run` SKILL.md.
+- `browser_take_screenshot` — `reports/{RUN-ID}/screenshots/` 에 PNG 저장. 파일명: `{scenario-slug}-{tc-id}-{step}-{설명}.png`. **프롬프트 있는 TC 는 기본 2장**: `02-prompt`(프롬프트 입력 직후·전송 전, 전체 뷰포트라 편집 전 본문=기준선 겸함) → `03-after`(완료 후). `01-before` 는 **(a) 프롬프트 없는 TC(저장/영속)** 또는 **(b) `02-prompt` 를 패널만 크롭한 경우**에만 찍는다. 결과가 1화면을 넘으면 `03b-after`·`03c-after`… 로 다장 캡처. 상세 규칙은 `/qa-run` SKILL.md.
 - `browser_console_messages` — 콘솔 에러 확인
 
 ## 즉시 기록 — `progress.jsonl`
