@@ -1,6 +1,6 @@
 // QA 자동화 대시보드 데이터 (시나리오 종료 시마다 /qa-run Skill 이 풀빌드 + 덮어쓰기)
 // 스키마 주체: templates/dashboard.html 내부 렌더링 JS.
-// TC 옵션 필드: prompt(string) / duration(string) / screenshots(string[], reports/ 기준 상대경로) / note(string) / run_id(string).
+// TC 옵션 필드: prompt(string) / duration(string, "AI 작업 시간" = 프롬프트 전송→편집 완료 실측, 예 "3s") / screenshots(string[], reports/ 기준 상대경로) / note(string) / run_id(string).
 
 window.QA_DATA = {
   meta: {

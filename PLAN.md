@@ -149,7 +149,7 @@ QA-automation/
 TC 종료 시점에 1줄씩 append. 중간 끊겨도 직전까지 결과 보존.
 
 ```json
-{"ts":"2026-05-02T14:30:42","run_id":"RUN-20260502-1430-dev","scenario":"01-회원가입","tc":"TC-01","result":"PASS","duration_ms":3200,"screenshot":["screenshots/signup-tc01-step1.png"],"note":""}
+{"ts":"2026-05-02T14:30:42","run_id":"RUN-20260502-1430-dev","scenario":"01-회원가입","tc":"TC-01","result":"PASS","wait_ms":3214,"screenshot":["screenshots/signup-tc01-01-before.png"],"note":""}
 ```
 
 `result` 가능 값: `PASS` / `FAIL` / `SKIP` / `BLOCKED` (선행 TC 의존 실패)

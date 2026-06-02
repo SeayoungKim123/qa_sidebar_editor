@@ -36,8 +36,17 @@ model: sonnet
 
 각 TC 마다 다음을 순서대로 수행하세요.
 
-### 1) 시작 시각 기록
-`t_start` 를 현재 시각으로 저장.
+### 1) 시각 측정 준비 — 브라우저 벽시계만 사용
+
+시간은 **반드시 `browser_evaluate(() => Date.now())` 로 브라우저에서 읽는다.** LLM 의 시간 감각으로 추정하지 말 것 (추정값 금지 — 깔끔한 반올림 숫자가 나오면 그건 측정이 아니다).
+
+- TC 시작 시 `t_tc_start = browser_evaluate(() => Date.now())` 기록 (시나리오 전체 타임아웃 판정용).
+- **AI 작업 시간 측정 (= 유저 체감 대기, 핵심 지표)**:
+  - 프롬프트 **전송 직전**(전송 버튼 누르기 직전)에 `t_send = browser_evaluate(() => Date.now())`
+  - AI 가 편집을 **완료했다고 판단되는 즉시** `t_done = browser_evaluate(() => Date.now())`
+  - `wait_ms = t_done - t_send`
+  - **"완료" 판단은 블랙박스 근사**: AI 응답 스트리밍이 멈추고 **+** 본문(문서/시트/슬라이드)에 결과가 반영된 시점. 그 순간 곧바로 시계를 읽는다 (스크린샷·검증보다 먼저).
+  - 프롬프트 없는 TC(저장/영속 등)는 동작 시작~완료를 같은 방식으로 재되, 측정할 AI 동작이 없으면 `wait_ms: null`.
 
 ### 2) Playwright MCP 로 브라우저 조작
 시나리오에 적힌 단계대로 다음 도구들을 사용:
@@ -77,11 +86,12 @@ model: sonnet
 TC 가 끝나는 즉시 (다음 TC 로 넘어가기 전) 다음 형식의 JSON 한 줄을 파일 끝에 추가:
 
 ```json
-{"ts":"2026-05-02T14:30:42","run_id":"RUN-20260502-1430-dev","scenario":"01-회원가입","tc":"TC-01","result":"PASS","duration_ms":3200,"screenshot":["screenshots/signup-tc01-step1.png"],"note":""}
+{"ts":"2026-05-02T14:30:42","run_id":"RUN-20260502-1430-dev","scenario":"01-회원가입","tc":"TC-01","result":"PASS","wait_ms":3214,"screenshot":["screenshots/signup-tc01-01-before.png"],"note":""}
 ```
 
 필드 설명:
 - `result`: `"PASS"` / `"FAIL"` / `"SKIP"` / `"BLOCKED"` (선행 TC 결과에 의존해 실행 불가한 경우)
+- `wait_ms`: **AI 작업 시간** — 프롬프트 전송→편집 완료 실측(밀리초, `browser_evaluate(Date.now())` 두 번 차이). 측정할 AI 동작이 없으면 `null`
 - `note`: 아래 **note 작성 규칙** 참조
 - `screenshot`: 관련 스크린샷 상대경로 배열
 
@@ -168,7 +178,8 @@ TC 가 끝나는 즉시 (다음 TC 로 넘어가기 전) 다음 형식의 JSON �
      - `screenshots`: progress.jsonl 의 `screenshot` 배열을 `reports/` 기준 상대경로로 변환 (`screenshots/foo.png` → `{RUN-ID}/screenshots/foo.png`). 누락된 `screenshots/` prefix 는 보정.
      - `note`: progress.jsonl 의 `note` 그대로.
      - `run_id`: 결과를 가져온 RUN-ID.
-     - 결과 없음 TC 는 세 필드 모두 생략.
+     - `duration`: **AI 작업 시간** — progress.jsonl 의 `wait_ms` 를 `"{round(wait_ms/1000)}s"` 로 변환 (예: `3214` → `"3s"`). `wait_ms` 가 `null`/누락이면 이 필드 생략 (대시보드가 `—` 표시).
+     - 결과 없음 TC 는 이 필드들 모두 생략.
 4. **KPI 재계산** (`kpis` 객체):
    - `pass`: 전체 PASS 개수
    - `fail`: 전체 FAIL 개수
