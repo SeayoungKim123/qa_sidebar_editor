@@ -121,11 +121,13 @@
       return;
     }
     const selected = ctx.selected || versions.current;
-    sel.innerHTML = versions.list.map((e) =>
+    const versionOptions = versions.list.map((e) =>
       `<option value="${escapeHtml(e.v)}"${e.v === selected ? ' selected' : ''}>`
       + `${escapeHtml(e.v)} · ${escapeHtml(e.date)} · ${escapeHtml(e.env)}`
       + `${e.v === versions.current ? ' (최신)' : ''}</option>`
     ).join('');
+    const liveOption = `<option value="live"${selected === 'live' ? ' selected' : ''}>data.js (latest live)</option>`;
+    sel.innerHTML = versionOptions + liveOption;
     sel.style.display = '';
     sel.onchange = () => {
       const params = new URLSearchParams(location.search);
@@ -142,9 +144,11 @@
     let selected = null;
     if (versions && Array.isArray(versions.list) && versions.list.length) {
       selected = params.get('v') || versions.current;
-      let entry = versions.list.find((e) => e.v === selected);
-      if (!entry) { selected = versions.current; entry = versions.list.find((e) => e.v === selected); }
-      if (entry && entry.file) file = entry.file;
+      if (selected !== 'live') {
+        let entry = versions.list.find((e) => e.v === selected);
+        if (!entry) { selected = versions.current; entry = versions.list.find((e) => e.v === selected); }
+        if (entry && entry.file) file = entry.file;
+      }
     }
     const s = document.createElement('script');
     s.src = file;
