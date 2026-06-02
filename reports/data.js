@@ -361,10 +361,11 @@ window.QA_DATA = {
     },
     {
       id: "ISS-003",
-      title: "모델 라인업 불일치 — GPT 4.1 미존재",
+      title: "모델 라인업 불일치 — GPT 4.1 미존재 (해소)",
       severity: "low",
+      status: "resolved",
       scenarios: ["01-AI-DOCX-편집", "02-AI-PPT-편집", "03-AI-Excel-편집"],
-      note: "시나리오에 명시된 GPT 4.1이 현재 없음. 실제 라인업: Claude 4.6 / GPT 5.4 / Gemini 3.1. 시나리오 사전조건 갱신 필요",
+      note: "해소(2026-06-02): 전 시나리오 사전조건을 GPT 5.4로 갱신. 현 라인업: Claude 4.6 / GPT 5.4 / Gemini 3.1.",
     },
   ],
 
