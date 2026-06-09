@@ -10,13 +10,13 @@ window.QA_DATA = {
   },
 
   kpis: {
-    total_runs: 6,
-    runs_by_env: "dev 6 · stage 0 · prd 0",
+    total_runs: 1,
+    runs_by_env: "dev 1 · stage 0 · prd 0",
     pass_rate: 75,
     pass: 3,
     fail: 1,
-    open_issues: 4,
-    issues_breakdown: "DOCX객체 1 · 차트서식 1 · 정렬 1 · 드로어 1",
+    open_issues: 1,
+    issues_breakdown: "메일 인사말중복·끝문장깨짐 1",
     scenario_count: 5,
     tc_count: 23,
   },
@@ -127,25 +127,10 @@ window.QA_DATA = {
   ],
 
   issues: [
-    { id: "ISS-006", title: "PPT 열린 덱 실시간 편집 불가", severity: "high", status: "resolved", detail: "원인은 코드 인터프리터(샌드박스) 경로. 채팅 + 메뉴에서 코드 인터프리터를 OFF로 두면 AI가 네이티브 슬라이드 도구(compose/patch_native_slide 등)로 열린 덱을 직접 편집. RUN-1405 재시험에서 03 9/9·04 6/6 PASS로 해소. PPT는 CI OFF 필요(ON이면 샌드박스로 빠짐).", scenarios: "03-PPT-실사용흐름 · 04-PPT-객체삽입" },
-    { id: "ISS-007", title: "DOCX 객체·구조 편집 도구 부재", severity: "high", status: "open", detail: "셀 병합·행 추가(unknown_error 간헐 실패)·차트·도형의 네이티브 도구 없음 → 텍스트/표 우회로만 대응(실제 개체 아님). 열 추가는 표 삭제후 재삽입 우회로만 가능.", scenarios: "02-DOCX-객체삽입" },
-    { id: "ISS-008", title: "차트 스타일 편집 미지원", severity: "medium", status: "open", detail: "Excel/DOCX 모두 차트 색상·축 글자 크기·격자선 등 스타일 편집 도구 부재. 차트 생성까지만 가능.", scenarios: "05-Excel TC-09 · 06-Excel TC-05" },
-    { id: "ISS-009", title: "셀/단락 가운데 정렬 옵션 부재", severity: "medium", status: "open", detail: "Excel 셀 서식 도구에 가운데 정렬 옵션이 없어 정렬 요청 미반영(테두리·병합 등 다른 서식은 정상).", scenarios: "05-Excel TC-07 · 06-Excel TC-06" },
-    { id: "ISS-005", title: "AI 채팅 드로어 backdrop 전송 차단", severity: "low", status: "mitigated", detail: "사이드바 토글 시 모바일 드로어 backdrop이 전송 버튼 클릭을 가로막음. 전 시나리오 Enter 전송으로 우회 운영.", scenarios: "전 시나리오 (운영 우회)" },
+    { id: "ISS-101", title: "메일 본문 인사말 중복·맺음말 끝문장 깨짐", severity: "medium", status: "open", detail: "기존 인사말이 있는 본문에 '인사말 추가' 요청 시 기존 인사 블록을 제거·병합하지 않고 새 인사말을 덧붙여 인사 블록 2개가 연달아 생성됨. 맺음말 끝문장은 '…바락니다. 궁평하십시오.' 등 문자 깨짐/생성 오류. 재현성·우선순위 확인 필요.", scenarios: "01-메일-백지작성 TC-03" },
   ],
 
   history: [
-    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 02:57", env: "dev", target: "01-AI-DOCX-편집", pass: 5, fail: 5, skip: 0, duration: "~80m", note: "TC-02/05/06/07/09 FAIL; DOCX 네이티브 서식 미적용 패턴 반복 (구 시나리오)" },
-    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 04:50", env: "dev", target: "02-AI-PPT-편집",  pass: 5, fail: 5, skip: 0, duration: "~32m", note: "TC-02/04 선택 자동화 불가, TC-05 빈슬라이드 없음, TC-06/07 일괄 편집 불가 (구 시나리오)" },
-    { run_id: "RUN-20260518-1148-dev", date: "2026-05-18 05:25", env: "dev", target: "03-AI-Excel-편집", pass: 6, fail: 7, skip: 0, duration: "~130m", note: "TC-01/04/06/09/11/12/13 FAIL; 날짜타입·시트전환·정렬·VLOOKUP시트명·차트서식 한계 (구 시나리오)" },
-    { run_id: "RUN-20260518-1518-dev", date: "2026-05-18 15:18", env: "dev", target: "02-AI-PPT-편집",  pass: 1, fail: 0, skip: 9, duration: "~8m", note: "TC-05 단독 PASS; 기존 슬라이드 본문 bullet 3개 삽입 확인 (구 시나리오)" },
-    { run_id: "RUN-20260518-1540-dev", date: "2026-05-18 15:40", env: "dev", target: "02-AI-PPT-편집",  pass: 0, fail: 3, skip: 7, duration: "~30m", note: "TC-02/04 선택 감지 불가, TC-06 제목 도형 구조 읽기 불가 (구 시나리오)" },
-    { run_id: "RUN-20260602-1405-dev", date: "2026-06-02 14:08", env: "dev", target: "01-DOCX-실사용흐름", pass: 9, fail: 0, skip: 0, duration: "~25m", note: "전체 풀실행 첫 회차: TC-01~09 전부 PASS. 백지작성·개별수정·일괄재서식 정상 (구 시나리오)" },
-    { run_id: "RUN-20260602-1405-dev", date: "2026-06-02 14:53", env: "dev", target: "02-DOCX-객체삽입", pass: 2, fail: 5, skip: 0, duration: "~16m", note: "표생성·열추가(우회)만 PASS. 셀병합·행추가·차트·도형 도구 부재(ISS-007) (구 시나리오)" },
-    { run_id: "RUN-20260602-1405-dev", date: "2026-06-02 17:34", env: "dev", target: "03-PPT-실사용흐름", pass: 9, fail: 0, skip: 0, duration: "~36m", note: "코드 인터프리터 OFF+Native 재시험: TC-01~09 전부 PASS (ISS-006 해소) (구 시나리오)" },
-    { run_id: "RUN-20260602-1405-dev", date: "2026-06-02 18:04", env: "dev", target: "04-PPT-객체삽입", pass: 6, fail: 0, skip: 0, duration: "~20m", note: "코드 인터프리터 OFF 재시험: TC-01~06 전부 PASS (차트는 도형 기반) (구 시나리오)" },
-    { run_id: "RUN-20260602-1405-dev", date: "2026-06-02 15:32", env: "dev", target: "05-Excel-실사용흐름", pass: 7, fail: 2, skip: 0, duration: "~20m", note: "SUM/IF 수식·통화·막대차트 정상. TC-07 정렬(ISS-009)·TC-09 차트서식(ISS-008) FAIL (구 시나리오)" },
-    { run_id: "RUN-20260602-1405-dev", date: "2026-06-02 15:56", env: "dev", target: "06-Excel-객체삽입", pass: 6, fail: 1, skip: 0, duration: "~16m", note: "표·SUM·막대/원형/꺾은선·병합+SUM참조 보정·영속 정상. TC-05 차트서식(ISS-008) FAIL (구 시나리오)" },
-    { run_id: "RUN-20260609-1536-dev", date: "2026-06-09 15:50", env: "dev", target: "01-메일-백지작성", pass: 3, fail: 1, skip: 0, duration: "~12m", note: "메일 AI 패널 첫 실행: 초안·끝추가·중간삽입 PASS. TC-03 인사말 중복+맺음말 끝문장 깨짐 FAIL. 모델 Claude Sonnet 4.6" },
+    { run_id: "RUN-20260609-1536-dev", date: "2026-06-09 15:50", env: "dev", target: "01-메일-백지작성", pass: 3, fail: 1, skip: 0, duration: "~12m", note: "메일 AI 패널 첫 회차(SCN-01만): 초안·끝추가·중간삽입 PASS. TC-03 인사말 중복+맺음말 끝문장 깨짐 FAIL. 본문 자동적용·모델 Claude Sonnet 4.6" },
   ],
 };
