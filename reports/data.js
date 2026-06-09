@@ -5,15 +5,15 @@
 window.QA_DATA = {
   meta: {
     env: "dev",
-    run_id: "RUN-20260609-1536-dev",
-    updated_at: "2026-06-09 15:50",
+    run_id: "RUN-20260609-1744-dev",
+    updated_at: "2026-06-09 17:54",
   },
 
   kpis: {
     total_runs: 1,
     runs_by_env: "dev 1 · stage 0 · prd 0",
-    pass_rate: 75,
-    pass: 3,
+    pass_rate: 0,
+    pass: 0,
     fail: 1,
     open_issues: 1,
     issues_breakdown: "메일 인사말중복·끝문장깨짐 1",
@@ -24,57 +24,24 @@ window.QA_DATA = {
   scenarios: [
     {
       id: "01-메일-백지작성",
-      pass: 3,
+      pass: 0,
       total: 4,
       tcs: [
         {
-          id: "TC-01", name: "메일 초안 작성 (백지)", status: "PASS",
+          id: "TC-01", name: "메일 초안 작성 (백지)", status: "FAIL",
           prompt: "거래처에 신제품 출시를 안내하는 비즈니스 메일 초안을 작성해줘. 출시일과 핵심 가치를 포함해서",
-          in_tokens: "56.4k", out_tokens: "1.8k",
-          run_id: "RUN-20260609-1536-dev",
+          in_tokens: "54.8k", out_tokens: "1.0k",
+          run_id: "RUN-20260609-1744-dev",
           screenshots: [
-            "RUN-20260609-1536-dev/screenshots/mail-tc01-02-prompt.png",
-            "RUN-20260609-1536-dev/screenshots/mail-tc01-03-after.png",
-            "RUN-20260609-1536-dev/screenshots/mail-tc01-03b-panel-zoom.png",
+            "RUN-20260609-1744-dev/screenshots/mail-tc01-02-prompt.png",
+            "RUN-20260609-1744-dev/screenshots/mail-tc01-03-after.png",
+            "RUN-20260609-1744-dev/screenshots/mail-tc01-03b-form-gate.png",
           ],
-          note: "빈 본문에 비즈니스 메일 초안 삽입(568자); 미제공 정보는 플레이스홀더",
+          note: "초안 미생성; AI가 정보입력 폼 요구, 건너뛰기 시 취소",
         },
-        {
-          id: "TC-02", name: "단락 추가", status: "PASS",
-          prompt: "메일 끝에 담당자 연락처와 문의 안내 단락을 추가해줘",
-          duration: "47s", in_tokens: "5.7k", out_tokens: "895",
-          run_id: "RUN-20260609-1536-dev",
-          screenshots: [
-            "RUN-20260609-1536-dev/screenshots/mail-tc02-02-prompt.png",
-            "RUN-20260609-1536-dev/screenshots/mail-tc02-03-after.png",
-            "RUN-20260609-1536-dev/screenshots/mail-tc02-03b-panel-zoom.png",
-          ],
-          note: "기존 초안 끝에 담당자 연락처·문의 안내 단락 추가; 본문 보존",
-        },
-        {
-          id: "TC-03", name: "인사말·맺음말 골격", status: "FAIL",
-          prompt: "메일 맨 앞에 정중한 비즈니스 인사말, 맨 끝에 맺음말을 넣어줘",
-          in_tokens: "8.0k", out_tokens: "2.6k",
-          run_id: "RUN-20260609-1536-dev",
-          screenshots: [
-            "RUN-20260609-1536-dev/screenshots/mail-tc03-02-prompt.png",
-            "RUN-20260609-1536-dev/screenshots/mail-tc03-03-after.png",
-            "RUN-20260609-1536-dev/screenshots/mail-tc03-03b-panel-zoom.png",
-          ],
-          note: "인사말·맺음말 추가됐으나 기존 인사와 중복(인사 2개); 맺음말 끝문장 깨짐",
-        },
-        {
-          id: "TC-04", name: "나열 정보 삽입", status: "PASS",
-          prompt: "본문 중간에 신제품 주요 특징 3가지를 넣어줘",
-          duration: "58s", in_tokens: "9.3k", out_tokens: "2.8k",
-          run_id: "RUN-20260609-1536-dev",
-          screenshots: [
-            "RUN-20260609-1536-dev/screenshots/mail-tc04-02-prompt.png",
-            "RUN-20260609-1536-dev/screenshots/mail-tc04-03-after.png",
-            "RUN-20260609-1536-dev/screenshots/mail-tc04-03b-panel-zoom.png",
-          ],
-          note: "핵심가치 섹션 뒤 본문 중간에 신제품 특징 3개 삽입; 기존 단락 보존",
-        },
+        { id: "TC-02", name: "단락 추가", status: "—" },
+        { id: "TC-03", name: "인사말·맺음말 골격", status: "—" },
+        { id: "TC-04", name: "나열 정보 삽입", status: "—" },
       ],
     },
     {

@@ -1,0 +1,1 @@
+{"ts":"2026-06-09T17:53:43","run_id":"RUN-20260609-1744-dev","scenario":"01-메일-백지작성","tc":"TC-01","result":"FAIL","wait_ms":null,"in_tokens":54840,"out_tokens":1020,"screenshot":["screenshots/mail-tc01-02-prompt.png","screenshots/mail-tc01-03-after.png","screenshots/mail-tc01-03b-form-gate.png"],"note":"초안 미생성; AI가 정보입력 폼 요구, 건너뛰기 시 취소"}
