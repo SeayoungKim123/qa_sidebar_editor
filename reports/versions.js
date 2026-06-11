@@ -3,8 +3,9 @@
 // 매니페스트가 비어 있으면 dashboard.html 은 버전 선택기를 숨기고 data.js(최신 라이브)만 로드한다.
 // (구 문서편집 v1~v4 스냅샷은 폐기. 메일 AI 시대 첫 완료 RUN 동결 시 v1 부터 다시 시작)
 window.QA_VERSIONS = {
-  current: "v3",
+  current: "v4",
   list: [
+    { v: 4, run_id: "RUN-20260611-0855-dev", env: "dev", date: "2026-06-11", file: "versions/v4.js" },
     { v: 3, run_id: "RUN-20260610-1058-dev", env: "dev", date: "2026-06-10", file: "versions/v3.js" },
     { v: 2, run_id: "RUN-20260610-0919-dev", env: "dev", date: "2026-06-10", file: "versions/v2.js" },
     { v: 1, run_id: "RUN-20260609-1859-dev", env: "dev", date: "2026-06-09", file: "versions/v1.js" },
