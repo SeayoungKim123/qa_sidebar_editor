@@ -19,7 +19,7 @@ window.QA_DATA = {
     open_issues: 6,
     issues_breakdown: "제목변환 본문삭제 1 · 크기명령 역방향 1 · 변환·다단계 지연 1 · 모델한도·가용성 1 · 직역치환 비문 1 · 인사말중복·끝문장깨짐 1",
     scenario_count: 6,
-    tc_count: 32,
+    tc_count: 31,
   },
 
   scenarios: [
@@ -336,7 +336,7 @@ window.QA_DATA = {
     {
       id: "06-메일-추천기능칩",
       pass: 6,
-      total: 7,
+      total: 6,
       tcs: [
         {
           id: "TC-01", name: "칩 — 문서 서식 정리", status: "PASS",
@@ -403,11 +403,6 @@ window.QA_DATA = {
             "RUN-20260610-1058-dev/screenshots/chips-tc06-03-after.png",
           ],
           note: "유효성검사 칩→발송 전 점검 리포트(임시URL 1건·본문/태그/placeholder 정상); 본문 무변경(리포트형) (Sonnet)",
-        },
-        {
-          id: "TC-07", name: "칩 — 맞춤법 검사하기", status: "—",
-          prompt: "[칩] 🔍 맞춤법 검사하기",
-          note: "구 SCN-04에서 칩 트리거 검증됨(오타 검출·리포트형). 칩 통합(현 SCN-06) 후 미실행 — 다음 회차 대상.",
         },
       ],
     },
